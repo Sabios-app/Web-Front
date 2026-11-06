@@ -4,7 +4,7 @@ export default function AuthLayout({ children }) {
       <aside className="w-2/5 bg-verde-petroleo text-white p-9">
         Painel verde
       </aside>
-      <main className="flex-1 bg-creme p-9">
+      <main className="flex-1 flex items-center justify-center bg-creme p-9">
         {children}
       </main>
     </div>
