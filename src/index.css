@@ -33,3 +33,72 @@ body {
   background: var(--color-creme);
   color: var(--color-verde-petroleo);
 }
+
+/* ==========================================================
+   Acessibilidade
+   ========================================================== */
+
+@theme {
+  /* Dourado para TEXTO sobre fundo claro (contraste 5,5:1).
+     O --color-dourado-escuro fica com 4:1 sobre o creme: use só em textos grandes. */
+  --color-dourado-texto: #8a5a1f;
+  /* Dourado suave dos fundos (forma atrás da foto, card "Para mentores") */
+  --color-dourado-areia: #e7c788;
+}
+
+body {
+  font-size: 1.0625rem; /* 17px: um pouco maior que o padrão para o público 50+ */
+}
+
+/* "Texto maior": o Tailwind usa rem, então aumentar a fonte do <html>
+   aumenta textos, botões e espaçamentos de uma vez. */
+html[data-texto-maior] {
+  font-size: 118.75%;
+}
+
+/* "Alto contraste": troca as cores do tema, e todas as classes
+   do Tailwind (bg-verde-petroleo, text-texto-secundario...) acompanham. */
+html[data-alto-contraste] {
+  --color-verde-petroleo: #000000;
+  --color-verde-titulo: #000000;
+  --color-verde-escuro: #000000;
+  --color-verde-hover: #222222;
+  --color-verde-icone: #000000;
+  --color-dourado: #ffd23f;
+  --color-dourado-escuro: #000000;
+  --color-dourado-claro: #ffd23f;
+  --color-dourado-texto: #000000;
+  --color-dourado-aviso: #fff3c4;
+  --color-dourado-areia: #ffe58a;
+  --color-creme: #ffffff;
+  --color-campo: #f2f2f2;
+  --color-divisoria: #000000;
+  --color-texto-secundario: #000000;
+  --color-descricao: #000000;
+}
+
+/* "Modo simples": esconde o que tiver a classe so-completo */
+html[data-modo-simples] .so-completo {
+  display: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Foco bem visível para quem navega pelo teclado */
+:focus-visible {
+  outline: 4px solid var(--color-dourado-foco);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
