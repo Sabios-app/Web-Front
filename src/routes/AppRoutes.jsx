@@ -4,6 +4,7 @@ import HomePage from '../pages/HomePage'
 import NaoEncontradaPage from '../pages/NaoEncontradaPage'
 import PerfilEspecialistaPage from '../pages/PerfilEspecialistaPage'
 import ControleDeRolagem from './ControleDeRolagem'
+import CadastroClientePage from '../pages/CadastroClientePage'
 
 /** Todas as rotas do site ficam aqui. Para criar uma página nova, adicione uma <Route>. */
 export default function AppRoutes() {
@@ -15,6 +16,7 @@ export default function AppRoutes() {
         <Route path="/especialistas/:id" element={<PerfilEspecialistaPage />} />
         <Route path="/cadastro" element={<EscolhaPerfilPage />} />
         <Route path="*" element={<NaoEncontradaPage />} />
+        <Route path="/cadastro/cliente" element={<CadastroClientePage />} />
       </Routes>
     </>
   )
