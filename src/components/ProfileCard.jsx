@@ -1,8 +1,12 @@
+import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 
-export default function ProfileCard({ icon, iconStyle, title, description, linkText }) {
+export default function ProfileCard({ icon, iconStyle, title, description, linkText, to }) {
   return (
-    <button className="flex flex-col justify-center gap-3 rounded-3xl bg-white p-6 text-left shadow-sm transition hover:shadow-md">
+    <Link
+      to={to}
+      className="flex flex-col justify-center gap-3 rounded-3xl bg-white p-6 text-left shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado-foco"
+    >
       <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconStyle}`}>
         {icon}
       </span>
@@ -11,6 +15,6 @@ export default function ProfileCard({ icon, iconStyle, title, description, linkT
       <span className="flex items-center gap-2 text-sm font-semibold text-dourado-escuro">
         {linkText} <ArrowRight size={16} />
       </span>
-    </button>
+    </Link>
   )
 }
