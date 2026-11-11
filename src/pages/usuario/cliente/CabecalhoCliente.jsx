@@ -1,0 +1,50 @@
+import { ArrowRight, Compass, Sparkles, Store } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+export default function CabecalhoCliente({ cliente }) {
+  return (
+    <div className="rounded-3xl border border-divisoria bg-white p-6 shadow-sm sm:p-8">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-5">
+          <img
+            src={cliente.foto}
+            alt={cliente.nome}
+            className="h-20 w-20 rounded-full border-2 border-verde-petroleo object-cover shadow-sm sm:h-24 sm:w-24"
+          />
+
+          <div>
+            <span className="inline-flex items-center gap-1 rounded-full bg-dourado-aviso px-3 py-1 text-xs font-bold uppercase tracking-wider text-dourado-escuro">
+              <Sparkles size={13} aria-hidden="true" /> Empreendedor
+            </span>
+
+            <h1 className="mt-1 font-titulo text-2xl font-bold text-verde-titulo sm:text-3xl">
+              Olá, {cliente.nome}!
+            </h1>
+
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-texto-secundario sm:text-base">
+              <span className="flex items-center gap-1 font-semibold text-verde-petroleo">
+                <Store size={16} className="text-dourado-escuro" />
+                {cliente.negocio}
+              </span>
+              <span>•</span>
+              <span>{cliente.tempoEmpreende} de atuação</span>
+              <span>•</span>
+              <span>{cliente.cidade}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/#especialistas"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-verde-petroleo px-6 text-sm font-bold text-white transition-colors hover:bg-verde-hover"
+          >
+            <Compass size={18} aria-hidden="true" />
+            <span>Encontrar novo conselheiro</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
