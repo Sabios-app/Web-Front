@@ -1,4 +1,5 @@
 import { Briefcase, Star } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import AuthLayout from '../layouts/AuthLayout'
 import ProfileCard from '../components/ProfileCard'
 
@@ -37,7 +38,9 @@ export default function EscolhaPerfilPage() {
 
         <p className="mt-8 text-sm text-texto-secundario">
           Já possui uma conta?{' '}
-          <a href="#" className="font-semibold text-dourado-escuro">Entrar agora</a>
+          <Link to="/login" className="font-semibold text-dourado-escuro hover:underline">
+            Entrar agora
+          </Link>
         </p>
       </div>
     </AuthLayout>
