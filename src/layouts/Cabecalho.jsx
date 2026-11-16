@@ -20,7 +20,7 @@ export default function Cabecalho() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-divisoria bg-creme/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-5 py-3 lg:px-8">
+      <div className="mx-auto flex max-w-310 items-center justify-between gap-4 px-5 py-3 lg:px-8">
         <Link to="/" aria-label="Sábios, página inicial" className="rounded-full">
           <LogoSabios />
         </Link>

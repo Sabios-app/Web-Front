@@ -151,7 +151,7 @@ export default function CadastroConselheiroPage() {
                 value={dados.sobre}
                 onChange={(e) => atualizar('sobre', e.target.value)}
                 placeholder="Ex.: Fui diretora financeira por 32 anos. Hoje ajudo pequenos negócios a organizar o fluxo de caixa..."
-                className="w-full rounded-xl border border-divisoria bg-white p-4 text-base text-verde-petroleo placeholder:text-texto-secundario/70 focus:border-dourado-foco focus:outline-none focus:ring-2 focus:ring-dourado-foco/30"
+                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
                 required
               />
             </div>

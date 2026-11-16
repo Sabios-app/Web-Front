@@ -158,7 +158,7 @@ export default function CadastroClientePage() {
                 id="tamanhoEquipe"
                 value={dados.tamanhoEquipe}
                 onChange={(e) => atualizar('tamanhoEquipe', e.target.value)}
-                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-base text-verde-petroleo focus:border-dourado-foco focus:outline-none focus:ring-2 focus:ring-dourado-foco/30"
+                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
               >
                 <option value="Apenas eu (autônomo/MEI)">Apenas eu (autônomo/MEI)</option>
                 <option value="1 a 5 pessoas">1 a 5 pessoas</option>
