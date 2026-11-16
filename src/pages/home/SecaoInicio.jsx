@@ -10,20 +10,20 @@ export default function SecaoInicio() {
         className="pointer-events-none absolute -left-40 top-20 hidden h-80 w-80 rounded-full border border-divisoria lg:block"
       />
 
-      <div className="mx-auto grid max-w-[1240px] items-center gap-12 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-20">
+      <div className="mx-auto grid max-w-310 items-center gap-12 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-20">
         <div className="relative z-10">
           <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-dourado/50 bg-dourado-aviso px-4 py-2 text-sm font-extrabold uppercase tracking-[.16em] text-dourado-texto">
             <span aria-hidden="true" className="h-2 w-2 rounded-full bg-dourado" />
             Experiência que transforma
           </p>
 
-          <h1 className="max-w-[680px] font-titulo text-5xl font-medium leading-[1.06] tracking-tight text-verde-titulo sm:text-6xl lg:text-[72px]">
+          <h1 className="max-w-170 font-titulo text-5xl font-medium leading-[1.06] tracking-tight text-verde-titulo sm:text-6xl lg:text-[72px]">
             Quem já viveu,
             <br />
             <em className="font-normal text-dourado-escuro">sabe o caminho.</em>
           </h1>
 
-          <p className="mt-6 max-w-[590px] text-xl leading-relaxed text-texto-secundario">
+          <p className="mt-6 max-w-147.5 text-xl leading-relaxed text-texto-secundario">
             Conectamos você a profissionais sêniores que transformam décadas de experiência em decisões melhores
             para o seu negócio.
           </p>
@@ -31,7 +31,7 @@ export default function SecaoInicio() {
           <form
             action="/especialistas"
             role="search"
-            className="mt-8 flex max-w-[630px] flex-col gap-2 rounded-2xl bg-white p-2 shadow-[0_18px_55px_rgba(23,59,58,.13)] sm:flex-row sm:items-center"
+            className="mt-8 flex max-w-157.5 flex-col gap-2 rounded-2xl bg-white p-2 shadow-[0_18px_55px_rgba(23,59,58,.13)] sm:flex-row sm:items-center"
           >
             <label htmlFor="busca-desafio" className="sr-only">
               Qual desafio você quer resolver?
@@ -68,7 +68,7 @@ export default function SecaoInicio() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[540px] lg:mr-0">
+        <div className="relative mx-auto w-full max-w-135 lg:mr-0">
           {/* Forma dourada atrás da foto */}
           <div
             aria-hidden="true"

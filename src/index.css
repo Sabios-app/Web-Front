@@ -49,22 +49,7 @@ body {
 
    /* animações */
   --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-aparecer: aparecer 0.6s var(--ease-suave) both;
 }
-
-
-/* ==========================================================
-   Acessibilidade
-   ========================================================== */
-
-@theme {
-  /* Dourado para TEXTO sobre fundo claro (contraste 5,5:1).
-     O --color-dourado-escuro fica com 4:1 sobre o creme: use só em textos grandes. */
-  --color-dourado-texto: #8a5a1f;
-  /* Dourado suave dos fundos (forma atrás da foto, card "Para mentores") */
-  --color-dourado-areia: #e7c788;
-}
-
 body {
   font-size: 1.0625rem; /* 17px: um pouco maior que o padrão para o público 50+ */
 }
@@ -86,7 +71,7 @@ html[data-alto-contraste] {
   --color-dourado: #ffd23f;
   --color-dourado-escuro: #000000;
   --color-dourado-claro: #ffd23f;
-  --color-dourado-texto: #000000;
+  --color-dourado-foco: #c78a3c;
   --color-dourado-aviso: #fff3c4;
   --color-dourado-areia: #ffe58a;
   --color-creme: #ffffff;

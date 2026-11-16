@@ -1,7 +1,7 @@
 export default function Rodape() {
   return (
     <footer className="bg-verde-escuro text-white">
-      <div className="mx-auto flex max-w-[1240px] flex-col gap-5 px-5 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div className="mx-auto flex max-w-310 flex-col gap-5 px-5 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <p className="flex items-center gap-3">
           <span className="font-titulo text-3xl font-semibold">sábios</span>
           <span aria-hidden="true" className="h-6 w-px bg-white/30" />
