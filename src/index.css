@@ -45,6 +45,11 @@ body {
   font-family: var(--font-corpo);
   background: var(--color-creme);
   color: var(--color-verde-petroleo);
+
+
+   /* animações */
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-aparecer: aparecer 0.6s var(--ease-suave) both;
 }
 
 

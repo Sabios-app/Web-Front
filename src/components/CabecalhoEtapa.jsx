@@ -12,7 +12,7 @@ export default function CabecalhoEtapa({ etapa, perfil, titulo, subtitulo, aoVol
       </button>
 
       <div className="mt-8 flex items-center justify-between text-sm font-bold">
-        <span className="uppercase tracking-widest text-dourado-escuro">Etapa {etapa} de 2</span>
+        <span className="uppercase tracking-widest text-dourado-texto">Etapa {etapa} de 2</span>
         <span className="text-texto-secundario">{perfil}</span>
       </div>
 
