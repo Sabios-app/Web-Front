@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
 import AuthLayout from '../layouts/AuthLayout'
 import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
@@ -114,25 +115,11 @@ export default function CadastroConselheiroPage() {
               <label className="mb-2 block text-base font-bold text-verde-titulo">
                 Áreas em que você pode aconselhar
               </label>
-              <div className="flex flex-wrap gap-2">
-                {AREAS_DISPONIVEIS.map((area) => {
-                  const ativa = dados.areas.includes(area)
-                  return (
-                    <button
-                      key={area}
-                      type="button"
-                      onClick={() => alternarArea(area)}
-                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                        ativa
-                          ? 'bg-verde-petroleo text-white shadow-xs'
-                          : 'border border-divisoria bg-white text-verde-petroleo hover:bg-campo'
-                      }`}
-                    >
-                      {area}
-                    </button>
-                  )
-                })}
-              </div>
+              <SelecaoOpcoes
+                opcoes={AREAS_DISPONIVEIS}
+                selecionadas={dados.areas}
+                aoAlternar={alternarArea}
+              />
             </div>
 
             <CampoTexto

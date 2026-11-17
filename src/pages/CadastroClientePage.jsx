@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
 import AuthLayout from '../layouts/AuthLayout'
 import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
@@ -114,25 +115,11 @@ export default function CadastroClientePage() {
               <label className="mb-2 block text-base font-bold text-verde-titulo">
                 Qual seu maior desafio no momento?
               </label>
-              <div className="flex flex-wrap gap-2">
-                {DESAFIOS_DISPONIVEIS.map((desafio) => {
-                  const ativa = dados.desafios.includes(desafio)
-                  return (
-                    <button
-                      key={desafio}
-                      type="button"
-                      onClick={() => alternarDesafio(desafio)}
-                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                        ativa
-                          ? 'bg-verde-petroleo text-white shadow-xs'
-                          : 'border border-divisoria bg-white text-verde-petroleo hover:bg-campo'
-                      }`}
-                    >
-                      {desafio}
-                    </button>
-                  )
-                })}
-              </div>
+              <SelecaoOpcoes
+                opcoes={DESAFIOS_DISPONIVEIS}
+                selecionadas={dados.desafios}
+                aoAlternar={alternarDesafio}
+              />
             </div>
 
             <CampoTexto
