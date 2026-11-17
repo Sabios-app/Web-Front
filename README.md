@@ -4,6 +4,15 @@ Aplicação web desenvolvida com **React 19**, **Vite** e **Tailwind CSS**, estr
 
 ---
 
+## 📚 Documentação do projeto
+
+Consulte os documentos abaixo para acompanhar o estado atual e a integração planejada:
+
+- [Atualização do projeto](./update.md) — alterações realizadas, pendências e próximas tarefas do frontend.
+- [Integração Web, Mobile e Backend](./integracao-web-mobile-backend.md) — funcionamento das rotas, API Spring Boot, autenticação e responsabilidades de cada aplicação.
+
+---
+
 ## 🚀 Tecnologias
 
 - **React 19**
