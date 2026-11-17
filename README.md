@@ -55,11 +55,11 @@ Web-Front/
 │   │   ├── layout/         # Container e estruturas visuais reutilizáveis
 │   │   └── navigation/     # Abas, links e controles de navegação
 │   ├── layouts/            # Estruturas base de layout (Header, Sidebar, Footer, MainLayout, AuthLayout)
-│   ├── pages/              # Páginas e telas da aplicação
+│   ├── pages/              # Páginas e telas da aplicação, organizadas por fluxo e perfil
 │   │   ├── home/            # Seções exclusivas da página inicial
 │   │   ├── perfil/          # Componentes exclusivos do perfil do especialista
 │   │   └── usuario/         # Componentes exclusivos das áreas de usuário
-│   ├── contexts/            # Estado global compartilhado por provedores React
+│   ├── contexts/           # Estado global compartilhado por provedores React
 │   ├── data/                # Mocks, dados locais e funções de formatação
 │   ├── hooks/               # Hooks reutilizáveis
 │   ├── routes/             # Definição e configuração de rotas e navegação da aplicação
@@ -71,6 +71,39 @@ Web-Front/
 ├── postcss.config.js       # Configuração do PostCSS para Tailwind
 └── vite.config.js          # Configurações do Vite
 ```
+
+### Organização da área de usuário
+
+A área autenticada segue uma separação por responsabilidade:
+
+```text
+src/
+├── components/usuario/     # Itens reutilizáveis da navegação e conta
+├── data/menusUsuario.js    # Menus e metadados de navegação por perfil
+├── layouts/                # Composição da barra lateral e cabeçalho autenticado
+└── pages/usuario/
+    ├── cliente/            # Conteúdos exclusivos do cliente
+    ├── conselheiro/        # Conteúdos exclusivos do conselheiro
+    └── compartilhado/      # Conteúdos usados pelos dois perfis
+```
+
+`AreaUsuarioLayout` deve apenas compor o layout e controlar a sessão. A regra de
+menu fica em `data/menusUsuario.js`, enquanto cada conteúdo de seção deve ficar
+em sua pasta de perfil ou em `pages/usuario/compartilhado/` quando for comum.
+
+### Áreas autenticadas
+
+Cliente e conselheiro possuem áreas independentes:
+
+- `/usuario/cliente`: acessível somente para o perfil `cliente`.
+- `/usuario/conselheiro`: acessível somente para o perfil `conselheiro`.
+- `src/contexts/AuthContext.js` mantém o perfil da sessão.
+- `src/routes/RotaProtegida.jsx` bloqueia acesso à área do perfil incorreto.
+
+Ao adicionar uma nova tela autenticada, ela deve ser registrada em `src/routes/`
+com `RotaProtegida` e o perfil esperado. O cabeçalho não deve oferecer links
+para trocar diretamente de área; a troca de perfil deve ocorrer por logout e
+novo login.
 
 ### Regra de decisão: `components/` ou `pages/`
 

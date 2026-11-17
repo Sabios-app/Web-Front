@@ -1,13 +1,9 @@
-import {
-  Compass,
-  History,
-} from 'lucide-react'
+import { Compass, History } from 'lucide-react'
 import { useState } from 'react'
 import BlocoDicas from '../components/feedback/BlocoDicas'
-import Container from '../components/layout/Container'
 import NavegacaoAbas from '../components/navigation/NavegacaoAbas'
 import { dadosCliente } from '../data/dadosUsuario'
-import MainLayout from '../layouts/MainLayout'
+import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
 import CabecalhoCliente from './usuario/cliente/CabecalhoCliente'
 import ConselheirosRecomendadosCliente from './usuario/cliente/ConselheirosRecomendadosCliente'
 import HistoricoMentoriasCliente from './usuario/cliente/HistoricoMentoriasCliente'
@@ -49,8 +45,8 @@ export default function UsuarioClientePage() {
   ]
 
   return (
-    <MainLayout>
-      <Container className="pb-24 pt-8">
+    <AreaUsuarioLayout usuario={cliente}>
+      <div className="mx-auto max-w-275">
         {/* Banner de boas-vindas do Cliente Empreendedor */}
         <CabecalhoCliente cliente={cliente} />
 
@@ -85,7 +81,7 @@ export default function UsuarioClientePage() {
 
         {/* Dicas para o empreendedor */}
         <BlocoDicas titulo="Como aproveitar ao máximo cada mentoria no Sábios" dicas={dicas} />
-      </Container>
-    </MainLayout>
+      </div>
+    </AreaUsuarioLayout>
   )
 }

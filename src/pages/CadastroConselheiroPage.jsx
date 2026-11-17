@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
 import AuthLayout from '../layouts/AuthLayout'
+import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
 import CampoTexto from '../components/CampoTexto'
-import Botao from '../components/Botao'
+import useAuth from '../hooks/useAuth'
 
 const AREAS_DISPONIVEIS = [
   'Finanças & Gestão',
@@ -16,6 +17,7 @@ const AREAS_DISPONIVEIS = [
 
 export default function CadastroConselheiroPage() {
   const navigate = useNavigate()
+  const { entrar } = useAuth()
 
   // em qual etapa a pessoa está (1 ou 2)
   const [etapa, setEtapa] = useState(1)
@@ -57,6 +59,7 @@ export default function CadastroConselheiroPage() {
       setEtapa(2)
     } else {
       // Cadastro finalizado: vai para o painel de conselheiro
+      entrar('conselheiro')
       navigate('/usuario/conselheiro')
     }
   }

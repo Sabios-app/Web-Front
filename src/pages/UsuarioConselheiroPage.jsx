@@ -6,10 +6,9 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import BlocoDicas from '../components/feedback/BlocoDicas'
-import Container from '../components/layout/Container'
 import NavegacaoAbas from '../components/navigation/NavegacaoAbas'
 import { dadosConselheiro } from '../data/dadosUsuario'
-import MainLayout from '../layouts/MainLayout'
+import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
 import AvaliacoesConselheiro from './usuario/conselheiro/AvaliacoesConselheiro'
 import CabecalhoConselheiro from './usuario/conselheiro/CabecalhoConselheiro'
 import DisponibilidadeAgendaConselheiro from './usuario/conselheiro/DisponibilidadeAgendaConselheiro'
@@ -78,8 +77,8 @@ export default function UsuarioConselheiroPage() {
   }
 
   return (
-    <MainLayout>
-      <Container className="pb-24 pt-8">
+    <AreaUsuarioLayout usuario={conselheiro}>
+      <div className="mx-auto max-w-275">
         {/* Banner de topo do Conselheiro */}
         <CabecalhoConselheiro
           conselheiro={conselheiro}
@@ -139,7 +138,7 @@ export default function UsuarioConselheiroPage() {
           titulo="Dicas Sábios: Como conduzir conversas transformadoras"
           dicas={dicas}
         />
-      </Container>
-    </MainLayout>
+      </div>
+    </AreaUsuarioLayout>
   )
 }

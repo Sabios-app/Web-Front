@@ -6,9 +6,11 @@ import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/LoginPage'
 import NaoEncontradaPage from '../pages/NaoEncontradaPage'
 import PerfilEspecialistaPage from '../pages/PerfilEspecialistaPage'
+import AreaUsuarioSecaoPage from '../pages/AreaUsuarioSecaoPage'
 import UsuarioClientePage from '../pages/UsuarioClientePage'
 import UsuarioConselheiroPage from '../pages/UsuarioConselheiroPage'
 import ControleDeRolagem from './ControleDeRolagem'
+import RotaProtegida from './RotaProtegida'
 
 /** Todas as rotas do site ficam aqui. Para criar uma página nova, adicione uma <Route>. */
 export default function AppRoutes() {
@@ -23,11 +25,61 @@ export default function AppRoutes() {
         <Route path="/cadastro/conselheiro" element={<CadastroConselheiroPage />} />
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Telas de Usuário: Conselheiro e Cliente */}
-        <Route path="/usuario/conselheiro" element={<UsuarioConselheiroPage />} />
-        <Route path="/painel/conselheiro" element={<UsuarioConselheiroPage />} />
-        <Route path="/usuario/cliente" element={<UsuarioClientePage />} />
-        <Route path="/painel/cliente" element={<UsuarioClientePage />} />
+        {/* Cada perfil possui uma área própria e não pode acessar a área do outro perfil. */}
+        <Route
+          path="/usuario/conselheiro"
+          element={
+            <RotaProtegida perfil="conselheiro">
+              <UsuarioConselheiroPage />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/painel/conselheiro"
+          element={
+            <RotaProtegida perfil="conselheiro">
+              <UsuarioConselheiroPage />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/usuario/cliente"
+          element={
+            <RotaProtegida perfil="cliente">
+              <UsuarioClientePage />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="/painel/cliente"
+          element={
+            <RotaProtegida perfil="cliente">
+              <UsuarioClientePage />
+            </RotaProtegida>
+          }
+        />
+        {['agenda', 'plano', 'mensagens', 'perfil'].map((secao) => (
+          <Route
+            key={`cliente-${secao}`}
+            path={`/usuario/cliente/${secao}`}
+            element={
+              <RotaProtegida perfil="cliente">
+                <AreaUsuarioSecaoPage />
+              </RotaProtegida>
+            }
+          />
+        ))}
+        {['agenda', 'solicitacoes', 'avaliacoes', 'perfil'].map((secao) => (
+          <Route
+            key={`conselheiro-${secao}`}
+            path={`/usuario/conselheiro/${secao}`}
+            element={
+              <RotaProtegida perfil="conselheiro">
+                <AreaUsuarioSecaoPage />
+              </RotaProtegida>
+            }
+          />
+        ))}
 
         {/* Rota 404 (Sempre no final) */}
         <Route path="*" element={<NaoEncontradaPage />} />
