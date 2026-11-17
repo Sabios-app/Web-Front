@@ -31,7 +31,7 @@ export default function PainelMensagens({ contatosIniciais }) {
   }
 
   return (
-    <section className="grid min-h-[32rem] overflow-hidden rounded-3xl border border-divisoria bg-white shadow-sm lg:grid-cols-[18rem_minmax(0,1fr)]">
+    <section className="grid min-h-128 overflow-hidden rounded-3xl border border-divisoria bg-white shadow-sm lg:grid-cols-[18rem_minmax(0,1fr)]">
       <aside className="border-b border-divisoria bg-campo/60 p-4 lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-2 px-2">
           <MessageCircle size={20} className="text-dourado-escuro" aria-hidden="true" />
@@ -60,7 +60,7 @@ export default function PainelMensagens({ contatosIniciais }) {
       </aside>
 
       {contato ? (
-        <div className="flex min-h-[32rem] min-w-0 flex-col">
+        <div className="flex min-h-128 min-w-0 flex-col">
           <header className="flex items-center gap-3 border-b border-divisoria px-5 py-4 sm:px-6">
             <img src={contato.foto} alt="" className="h-12 w-12 rounded-full border-2 border-verde-petroleo object-cover" />
             <div>
