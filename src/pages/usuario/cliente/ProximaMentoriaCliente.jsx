@@ -1,4 +1,4 @@
-import { Clock, HelpCircle, Plus, Trash2, Video } from 'lucide-react'
+import { CalendarDays, Clock, HelpCircle, Plus, Trash2, Video } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -27,7 +27,7 @@ export default function ProximaMentoriaCliente({ mentoria }) {
           Encontre um profissional sênior para conversar sobre os desafios do seu negócio.
         </p>
         <Link
-          to="/#especialistas"
+          to="/especialistas"
           className="mt-4 inline-flex min-h-12 items-center justify-center rounded-full bg-verde-petroleo px-6 text-sm font-bold text-white hover:bg-verde-hover"
         >
           Ver conselheiros disponíveis
@@ -38,20 +38,20 @@ export default function ProximaMentoriaCliente({ mentoria }) {
 
   return (
     <div className="overflow-hidden rounded-3xl border-2 border-verde-petroleo/20 bg-white shadow-md">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisoria bg-emerald-50/70 px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisoria bg-dourado-aviso/60 px-5 py-4 sm:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-3 w-3 rounded-full bg-emerald-700 animate-pulse" />
-          <span className="font-bold text-emerald-950">
+          <span className="flex h-3 w-3 rounded-full bg-dourado animate-pulse motion-reduce:animate-none" />
+          <span className="font-bold text-verde-titulo">
             Sua Próxima Mentoria
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-semibold text-emerald-950">
+        <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-1 text-sm font-semibold text-dourado-escuro">
           <Clock size={16} aria-hidden="true" />
           <span>{mentoria.emBreveTexto}</span>
         </div>
       </div>
 
-      <div className="p-6 sm:p-8">
+      <div className="p-5 sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
             <img
@@ -69,10 +69,16 @@ export default function ProximaMentoriaCliente({ mentoria }) {
               <p className="text-sm font-medium text-texto-secundario">
                 {mentoria.especialistaDescricao}
               </p>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm font-bold text-verde-petroleo">
-                <span>📅 {mentoria.data}</span>
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-bold text-verde-petroleo">
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarDays size={16} className="text-dourado-escuro" aria-hidden="true" />
+                  {mentoria.data}
+                </span>
                 <span>•</span>
-                <span>⏰ {mentoria.horario}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock size={16} className="text-dourado-escuro" aria-hidden="true" />
+                  {mentoria.horario}
+                </span>
               </div>
             </div>
           </div>
@@ -134,7 +140,7 @@ export default function ProximaMentoriaCliente({ mentoria }) {
             ))}
           </ul>
 
-          <form onSubmit={adicionarPergunta} className="mt-3 flex gap-2">
+          <form onSubmit={adicionarPergunta} className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input
               type="text"
               value={novaPergunta}
@@ -144,7 +150,7 @@ export default function ProximaMentoriaCliente({ mentoria }) {
             />
             <button
               type="submit"
-              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-verde-petroleo px-4 text-sm font-bold text-white hover:bg-verde-hover"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-4 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
             >
               <Plus size={16} />
               Anotar

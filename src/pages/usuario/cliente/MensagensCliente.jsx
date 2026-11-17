@@ -1,21 +1,19 @@
+import PainelMensagens from '../../../components/mensagens/PainelMensagens'
+
+const conversas = [
+  {
+    id: 'helena',
+    nome: 'Helena Martins',
+    descricao: 'Conselheira • Finanças & Gestão',
+    foto: 'https://images.unsplash.com/photo-1758691737605-69a0e78bd193?auto=format&fit=crop&w=400&q=80',
+    ultimaMensagem: 'Perfeito, até a nossa sessão...',
+    mensagens: [
+      { id: 'h1', texto: 'Olá! Revisei o material que você enviou. Está evoluindo muito bem.', propria: false, horario: 'Ontem, 16:40' },
+      { id: 'h2', texto: 'Perfeito! Vou revisar antes da nossa sessão.', propria: true, horario: 'Ontem, 16:45' },
+    ],
+  },
+]
+
 export default function MensagensCliente() {
-  return (
-    <div className="grid gap-6 rounded-3xl bg-white p-6 shadow-sm lg:grid-cols-[18rem_1fr]">
-      <div className="rounded-2xl bg-campo p-4">
-        <p className="text-sm text-texto-secundario">Conversas recentes</p>
-        <div className="mt-4 rounded-2xl bg-white p-4">
-          <p className="font-bold text-verde-titulo">Helena Martins</p>
-          <p className="mt-1 text-sm text-texto-secundario">Perfeito, até a nossa sessão...</p>
-        </div>
-      </div>
-      <div className="flex min-h-64 flex-col justify-end rounded-2xl border border-divisoria p-5">
-        <p className="max-w-md rounded-2xl bg-campo p-4 text-verde-titulo">
-          Olá! Revisei o material que você enviou. Está evoluindo muito bem.
-        </p>
-        <p className="mt-3 self-end rounded-2xl rounded-br-sm bg-verde-petroleo p-4 text-white">
-          Perfeito! Vou revisar antes da nossa sessão.
-        </p>
-      </div>
-    </div>
-  )
+  return <PainelMensagens contatosIniciais={conversas} />
 }

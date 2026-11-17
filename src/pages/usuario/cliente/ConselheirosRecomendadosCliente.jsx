@@ -8,7 +8,7 @@ export default function ConselheirosRecomendadosCliente({ conselheiros }) {
       {conselheiros.map((esp) => (
         <div
           key={esp.id}
-          className="flex flex-col justify-between rounded-3xl border border-divisoria bg-white p-6 shadow-sm transition hover:shadow-md"
+          className="flex flex-col justify-between rounded-3xl border border-divisoria bg-white p-5 shadow-sm transition duration-500 ease-suave hover:-translate-y-1 hover:border-dourado-claro hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-6"
         >
           <div>
             <div className="flex items-center gap-4">

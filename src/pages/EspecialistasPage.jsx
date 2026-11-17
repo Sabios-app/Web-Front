@@ -56,7 +56,7 @@ export default function EspecialistasPage() {
   return (
     <MainLayout>
       <section className="bg-verde-petroleo text-white">
-        <div className="mx-auto max-w-[1240px] px-5 py-12 sm:py-16 lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-310 px-5 py-12 sm:py-16 lg:px-8 lg:py-20">
           <Link to="/" className="text-sm font-bold text-white/80 underline-offset-4 hover:text-white hover:underline">
             ← Voltar para o início
           </Link>
@@ -89,7 +89,7 @@ export default function EspecialistasPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1240px] px-5 py-10 sm:py-14 lg:px-8 lg:py-20">
+      <section className="mx-auto max-w-310 px-5 py-10 sm:py-14 lg:px-8 lg:py-20">
         <div className="flex flex-col gap-4 border-b border-divisoria pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="font-titulo text-3xl text-verde-titulo sm:text-4xl">Especialistas disponíveis</h2>

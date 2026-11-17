@@ -69,21 +69,21 @@ export default function AppRoutes() {
         {['agenda', 'plano', 'mensagens', 'perfil'].map((secao) => (
           <Route
             key={`cliente-${secao}`}
-            path={`/usuario/cliente/${secao}`}
+            path="/usuario/cliente/:secao"
             element={
               <RotaProtegida perfil="cliente">
-                <AreaUsuarioSecaoPage />
+                <AreaUsuarioSecaoPage perfil="cliente" />
               </RotaProtegida>
             }
           />
         ))}
-        {['agenda', 'solicitacoes', 'avaliacoes', 'perfil'].map((secao) => (
+        {['agenda', 'solicitacoes', 'mensagens', 'avaliacoes', 'perfil'].map((secao) => (
           <Route
             key={`conselheiro-${secao}`}
-            path={`/usuario/conselheiro/${secao}`}
+            path="/usuario/conselheiro/:secao"
             element={
               <RotaProtegida perfil="conselheiro">
-                <AreaUsuarioSecaoPage />
+                <AreaUsuarioSecaoPage perfil="conselheiro" />
               </RotaProtegida>
             }
           />

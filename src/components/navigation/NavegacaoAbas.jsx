@@ -1,6 +1,6 @@
 export default function NavegacaoAbas({ abas, abaAtiva, aoSelecionar, id }) {
   return (
-    <div id={id} className="flex gap-2 overflow-x-auto border-b border-divisoria">
+    <div id={id} className="sem-barra-rolagem flex gap-2 overflow-x-auto border-b border-divisoria">
       {abas.map(({ id: abaId, icone: Icone, rotulo, contador }) => {
         const ativa = abaAtiva === abaId
 
@@ -10,7 +10,8 @@ export default function NavegacaoAbas({ abas, abaAtiva, aoSelecionar, id }) {
             id={`aba-${abaId}`}
             type="button"
             onClick={() => aoSelecionar(abaId)}
-            className={`flex min-h-12 items-center gap-2 whitespace-nowrap border-b-2 px-5 text-base font-bold transition-colors ${
+            aria-selected={ativa}
+            className={`flex min-h-12 items-center gap-2 whitespace-nowrap border-b-2 px-3 text-sm font-bold transition-colors sm:px-5 sm:text-base ${
               ativa
                 ? 'border-verde-petroleo text-verde-petroleo'
                 : 'border-transparent text-texto-secundario hover:text-verde-petroleo'

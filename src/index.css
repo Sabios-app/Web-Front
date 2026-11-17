@@ -90,6 +90,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Mantém a navegação horizontal acessível sem exibir uma barra que ocupa espaço no mobile. */
+.sem-barra-rolagem {
+  scrollbar-width: none;
+}
+
+.sem-barra-rolagem::-webkit-scrollbar {
+  display: none;
+}
+
 /* Foco bem visível para quem navega pelo teclado */
 :focus-visible {
   outline: 4px solid var(--color-dourado-foco);

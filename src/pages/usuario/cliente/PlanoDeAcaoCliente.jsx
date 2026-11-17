@@ -53,7 +53,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
 
       <div className="mt-4 h-2 w-full rounded-full bg-divisoria">
         <div
-          className="h-full rounded-full bg-emerald-700 transition-all duration-300"
+          className="h-full rounded-full bg-dourado transition-all duration-500 ease-suave motion-reduce:transition-none"
           style={{ width: `${porcentagem}%` }}
         />
       </div>
@@ -65,7 +65,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
             onClick={() => alternarAcao(a.id)}
             className={`flex cursor-pointer items-start gap-3.5 rounded-2xl border p-4 transition ${
               a.concluido
-                ? 'border-emerald-200 bg-emerald-50/50 text-texto-secundario'
+                ? 'border-dourado-claro/60 bg-dourado-aviso/40 text-texto-secundario'
                 : 'border-divisoria bg-white hover:border-verde-petroleo'
             }`}
           >
@@ -75,7 +75,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
               aria-label={a.concluido ? 'Marcar como pendente' : 'Marcar como concluída'}
             >
               {a.concluido ? (
-                <CheckSquare size={22} className="text-emerald-700" />
+                <CheckSquare size={22} className="text-dourado-escuro" />
               ) : (
                 <Square size={22} className="text-texto-secundario" />
               )}
@@ -92,7 +92,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
               <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-texto-secundario">
                 <span>Orientado por: <strong>{a.conselheiro}</strong></span>
                 <span>•</span>
-                <span className={a.concluido ? 'text-emerald-700 font-bold' : 'text-dourado-escuro font-bold'}>
+                <span className={a.concluido ? 'text-dourado-escuro font-bold' : 'text-dourado-escuro font-bold'}>
                   {a.prazo}
                 </span>
               </div>
@@ -101,7 +101,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
         ))}
       </div>
 
-      <form onSubmit={adicionarAcao} className="mt-6 flex gap-2 border-t border-divisoria pt-6">
+      <form onSubmit={adicionarAcao} className="mt-6 flex flex-col gap-2 border-t border-divisoria pt-6 sm:flex-row">
         <input
           type="text"
           value={novaAcao}
@@ -111,7 +111,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
         />
         <button
           type="submit"
-          className="inline-flex h-12 items-center gap-1.5 rounded-full bg-verde-petroleo px-5 text-sm font-bold text-white hover:bg-verde-hover"
+          className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-5 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
         >
           <Plus size={16} />
           Adicionar
