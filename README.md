@@ -49,11 +49,20 @@ Web-Front/
 ├── public/                 # Arquivos públicos estáticos (ícones SVG, favicons)
 ├── src/
 │   ├── assets/             # Imagens locais, ilustrações e recursos estáticos importados no código
-│   ├── components/         # Componentes reutilizáveis e modulares (Botões, Cards, Inputs, Modais, etc.)
+│   ├── components/         # Componentes reutilizáveis e modulares
+│   │   ├── feedback/       # Alertas, mensagens e blocos informativos
+│   │   ├── forms/          # Campos, seleções e controles de formulário
+│   │   ├── layout/         # Container e estruturas visuais reutilizáveis
+│   │   └── navigation/     # Abas, links e controles de navegação
 │   ├── layouts/            # Estruturas base de layout (Header, Sidebar, Footer, MainLayout, AuthLayout)
-│   ├── pages/              # Páginas e telas da aplicação (cada tela com sua view ou sub-componentes locais)
+│   ├── pages/              # Páginas e telas da aplicação
+│   │   ├── home/            # Seções exclusivas da página inicial
+│   │   ├── perfil/          # Componentes exclusivos do perfil do especialista
+│   │   └── usuario/         # Componentes exclusivos das áreas de usuário
+│   ├── contexts/            # Estado global compartilhado por provedores React
+│   ├── data/                # Mocks, dados locais e funções de formatação
+│   ├── hooks/               # Hooks reutilizáveis
 │   ├── routes/             # Definição e configuração de rotas e navegação da aplicação
-│   ├── App.css             # Estilos de apoio legados (priorizar Tailwind)
 │   ├── App.jsx             # Componente raiz / casca da aplicação
 │   ├── index.css           # Estilos globais e importação do Tailwind CSS (@import "tailwindcss";)
 │   └── main.jsx            # Ponto de entrada React (renderização no DOM)
@@ -62,6 +71,32 @@ Web-Front/
 ├── postcss.config.js       # Configuração do PostCSS para Tailwind
 └── vite.config.js          # Configurações do Vite
 ```
+
+### Regra de decisão: `components/` ou `pages/`
+
+- Coloque em `src/components/` tudo que puder ser utilizado por duas ou mais páginas
+  ou que represente um padrão visual do produto.
+- Coloque em uma subpasta de `src/pages/` os componentes exclusivos de um fluxo ou
+  de uma tela, como uma seção da home ou um bloco específico do painel.
+- Uma página deve montar o fluxo e o estado da tela. Ela não deve concentrar markup
+  repetido que possa ser extraído para um componente reutilizável.
+- Dados mockados e funções de formatação ficam em `src/data/`. Hooks ficam em
+  `src/hooks/` e contextos globais ficam em `src/contexts/`.
+
+### Organização dos componentes compartilhados
+
+Os componentes compartilhados devem ser agrupados por responsabilidade:
+
+```text
+src/components/
+├── feedback/      # BlocoDicas, Alertas e estados de retorno
+├── forms/         # CampoTexto, SelecaoOpcoes e controles de entrada
+├── layout/        # Container e componentes de composição visual
+└── navigation/    # NavegacaoAbas e componentes de navegação
+```
+
+Use `PascalCase` para o nome do arquivo e do componente. Prefira props descritivas
+e mantenha o componente sem conhecimento de regras específicas de uma página.
 
 ---
 
@@ -110,6 +145,9 @@ Todos os 3 desenvolvedores devem seguir os padrões já aplicados no repositóri
 - **camelCase** para funções utilitárias, hooks e variáveis: `useAuth.js`, `formatCurrency.js`.
 - Componentes funcionais com Hooks (`useState`, `useEffect`, etc.).
 - **Responsabilidade Única:** Evite arquivos de páginas gigantescos; quebre seções complexas em componentes menores dentro de `src/components/` ou em pastas dedicadas dentro de `src/pages/`.
+- Componentes compartilhados devem ser extraídos quando o mesmo padrão aparecer em
+  mais de uma página. Exemplos atuais: `Container`, `NavegacaoAbas`, `BlocoDicas` e
+  `SelecaoOpcoes`.
 
 ### 2. Estilização com Tailwind CSS
 - **Priorize classes nativas do Tailwind**: evite criar arquivos `.css` individuais por componente ou usar `style={{ ... }}` inline.
