@@ -133,42 +133,6 @@ e mantenha o componente sem conhecimento de regras específicas de uma página.
 
 ---
 
-## 📋 O Que a Equipe (3 Pessoas) Precisa para Desenvolver as Páginas
-
-Para que os 3 desenvolvedores iniciem e entreguem as páginas com eficiência e sem atritos, precisamos definir os seguintes insumos:
-
-### 1. Mapa de Páginas e Rotas (Escopo)
-- Lista exata das páginas a serem criadas (exemplo: `Login`, `Dashboard`, `Listagem`, `Cadastro/Edição`, `Perfil`).
-- Endereços de rota esperados (ex.: `/login`, `/dashboard`, `/usuarios`, etc.).
-- Comportamento de navegação (rotas públicas vs. rotas autenticadas/protegidas).
-
-### 2. Definição do Roteador (`react-router-dom`)
-- A pasta `src/routes/` já está criada. Para habilitar a troca de páginas, a equipe precisa adotar a biblioteca de rotas (ex.: instalar `react-router-dom`) e centralizar o roteamento em `src/routes/index.jsx` (ou `AppRoutes.jsx`).
-
-### 3. Protótipos de Design / Telas (Figma ou Wireframes)
-- Telas desenhadas com estados visuais: carregamento (*loading*), tela vazia (*empty state*), sucesso e erro.
-- Guia visual de espaçamentos, tipografia e paleta de cores para alinhamento com o Tailwind.
-- Diretrizes de responsividade (visualização mobile vs. desktop).
-
-### 4. Contratos de API / Mocks de Dados
-- Formato dos dados que cada página irá consumir do `Api-Backend` (campos esperados em requisições/respostas).
-- Caso o backend ainda esteja em desenvolvimento, a equipe pode utilizar mocks locais (dados estáticos em JSON) para construir as interfaces sem bloqueios.
-
-### 5. Divisão de Trabalho Sugerida para 3 Pessoas
-Para evitar conflitos de merge e retrabalho, recomenda-se organizar a equipe em frentes paralelas:
-- **Dev 1 (Fundação & Layouts):**
-  - Configuração do roteador (`src/routes/`).
-  - Criação dos layouts base em `src/layouts/` (Navbar, Sidebar, Footer, wrappers com `<Outlet />`).
-  - Páginas de autenticação / entrada (ex.: Login, Recuperação de Senha).
-- **Dev 2 (Páginas Principais / Fluxo Central):**
-  - Construção das telas centrais do sistema em `src/pages/` (ex.: Dashboard, Visão Geral, Relatórios).
-  - Componentes específicos dessas telas.
-- **Dev 3 (Formulários, Listagens & Componentes Reutilizáveis):**
-  - Criação do design system compartilhado em `src/components/` (Input, Button, Modal, Table/Grid, Badge).
-  - Páginas de cadastro, listagens de dados e formulários em `src/pages/`.
-
----
-
 ## 🛡️ Boas Práticas Obrigatórias do Projeto
 
 Todos os 3 desenvolvedores devem seguir os padrões já aplicados no repositório:
