@@ -1,11 +1,15 @@
 import { Route, Routes } from 'react-router-dom'
 import CadastroClientePage from '../pages/CadastroClientePage'
 import CadastroConselheiroPage from '../pages/CadastroConselheiroPage'
+import AjudaPage from '../pages/AjudaPage'
+import EspecialistasPage from '../pages/EspecialistasPage'
 import EscolhaPerfilPage from '../pages/EscolhaPerfilPage'
 import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/LoginPage'
 import NaoEncontradaPage from '../pages/NaoEncontradaPage'
 import PerfilEspecialistaPage from '../pages/PerfilEspecialistaPage'
+import PrivacidadePage from '../pages/PrivacidadePage'
+import RecuperarSenhaPage from '../pages/RecuperarSenhaPage'
 import AreaUsuarioSecaoPage from '../pages/AreaUsuarioSecaoPage'
 import UsuarioClientePage from '../pages/UsuarioClientePage'
 import UsuarioConselheiroPage from '../pages/UsuarioConselheiroPage'
@@ -19,11 +23,15 @@ export default function AppRoutes() {
       <ControleDeRolagem />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/especialistas" element={<EspecialistasPage />} />
         <Route path="/especialistas/:id" element={<PerfilEspecialistaPage />} />
         <Route path="/cadastro" element={<EscolhaPerfilPage />} />
         <Route path="/cadastro/cliente" element={<CadastroClientePage />} />
         <Route path="/cadastro/conselheiro" element={<CadastroConselheiroPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
+        <Route path="/ajuda" element={<AjudaPage />} />
+        <Route path="/privacidade" element={<PrivacidadePage />} />
 
         {/* Cada perfil possui uma área própria e não pode acessar a área do outro perfil. */}
         <Route

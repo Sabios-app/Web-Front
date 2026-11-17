@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Rodape() {
   return (
     <footer className="bg-verde-escuro text-white">
@@ -11,14 +13,14 @@ export default function Rodape() {
         <nav aria-label="Rodapé">
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-lg">
             <li>
-              <a href="/ajuda" className="text-white underline-offset-4 hover:underline">
+              <Link to="/ajuda" className="text-white underline-offset-4 hover:underline">
                 Ajuda
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/privacidade" className="text-white underline-offset-4 hover:underline">
+              <Link to="/privacidade" className="text-white underline-offset-4 hover:underline">
                 Privacidade
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
