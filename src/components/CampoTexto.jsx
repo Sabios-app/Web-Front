@@ -1,4 +1,4 @@
-export default function CampoTexto({ id, rotulo, placeholder, valor, aoMudar, obrigatorio }) {
+export default function CampoTexto({ id, rotulo, placeholder, valor, aoMudar, obrigatorio, type = 'text' }) {
   return (
     <div>
       <label htmlFor={id} className="mb-2 block text-base font-bold text-verde-titulo">
@@ -6,7 +6,7 @@ export default function CampoTexto({ id, rotulo, placeholder, valor, aoMudar, ob
       </label>
       <input
         id={id}
-        type="text"
+        type={type}
         value={valor}
         onChange={aoMudar}
         placeholder={placeholder}
