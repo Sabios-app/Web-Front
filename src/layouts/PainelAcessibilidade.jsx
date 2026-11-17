@@ -57,10 +57,10 @@ export default function PainelAcessibilidade() {
           tabIndex={-1}
           role="dialog"
           aria-label="Ajustes de acessibilidade"
-          className="flex max-h-[75vh] w-[min(22rem,calc(100vw-2rem))] flex-col gap-3 overflow-y-auto rounded-3xl border-2 border-verde-petroleo bg-white p-4 shadow-2xl"
+          className="flex max-h-[75vh] w-[min(20rem,calc(100vw-2rem))] flex-col gap-3 overflow-y-auto rounded-3xl border-2 border-verde-petroleo bg-white p-3 shadow-2xl"
         >
           <div className="flex items-center justify-between">
-            <p className="font-titulo text-xl font-semibold text-verde-titulo">Acessibilidade</p>
+            <p className="font-titulo text-lg font-semibold text-verde-titulo">Acessibilidade</p>
             <button
               type="button"
               onClick={() => setAberto(false)}
@@ -135,12 +135,13 @@ export default function PainelAcessibilidade() {
         aria-expanded={aberto}
         aria-controls="painel-acessibilidade"
         onClick={() => setAberto((v) => !v)}
-        className="flex min-h-14 items-center gap-2 rounded-full border-2 border-white bg-verde-petroleo px-5 text-lg font-bold text-white shadow-xl hover:bg-verde-hover"
+        aria-label="Abrir acessibilidade"
+        title="Acessibilidade"
+        className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-verde-petroleo text-lg font-bold text-white shadow-xl hover:bg-verde-hover sm:h-14 sm:w-14"
       >
         <span aria-hidden="true" className="font-titulo text-xl">
           Aa
         </span>
-        Acessibilidade
       </button>
     </div>
   )

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { dadosConselheiro } from '../data/dadosUsuario'
-import MainLayout from '../layouts/MainLayout'
+import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
 import AvaliacoesConselheiro from './usuario/conselheiro/AvaliacoesConselheiro'
 import CabecalhoConselheiro from './usuario/conselheiro/CabecalhoConselheiro'
 import DisponibilidadeAgendaConselheiro from './usuario/conselheiro/DisponibilidadeAgendaConselheiro'
@@ -32,8 +32,8 @@ export default function UsuarioConselheiroPage() {
   }
 
   return (
-    <MainLayout>
-      <div className="mx-auto max-w-[1240px] px-5 pb-24 pt-8 lg:px-8">
+    <AreaUsuarioLayout usuario={conselheiro}>
+      <div className="mx-auto max-w-275">
         {/* Banner de topo do Conselheiro */}
         <CabecalhoConselheiro
           conselheiro={conselheiro}
@@ -177,6 +177,6 @@ export default function UsuarioConselheiroPage() {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </AreaUsuarioLayout>
   )
 }

@@ -3,21 +3,20 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../components/Botao'
 import CampoTexto from '../components/CampoTexto'
+import useAuth from '../hooks/useAuth'
 import AuthLayout from '../layouts/AuthLayout'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { entrar } = useAuth()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [tipoPerfil, setTipoPerfil] = useState('conselheiro')
 
   function handleLogin(e) {
     e.preventDefault()
-    if (tipoPerfil === 'conselheiro') {
-      navigate('/usuario/conselheiro')
-    } else {
-      navigate('/usuario/cliente')
-    }
+    entrar(tipoPerfil)
+    navigate(tipoPerfil === 'conselheiro' ? '/usuario/conselheiro' : '/usuario/cliente')
   }
 
   return (

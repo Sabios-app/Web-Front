@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import BotaoLink from '../components/BotaoLink'
 import LogoSabios from '../components/LogoSabios'
+import useAuth from '../hooks/useAuth'
 
 const linksPublicos = [
   { href: '/#como-funciona', texto: 'Como funciona' },
@@ -13,10 +14,12 @@ const linksPublicos = [
 export default function Cabecalho() {
   const [menuAberto, setMenuAberto] = useState(false)
   const location = useLocation()
+  const { perfil, sair } = useAuth()
 
-  const estaNoPainelConselheiro = location.pathname.includes('/conselheiro')
-  const estaNoPainelCliente = location.pathname.includes('/cliente') && !location.pathname.includes('/cadastro')
-  const estaNaAreaUsuario = estaNoPainelConselheiro || estaNoPainelCliente
+  const estaNaAreaUsuario =
+    Boolean(perfil) &&
+    (location.pathname.includes('/conselheiro') || location.pathname.includes('/cliente'))
+  const nomeArea = perfil === 'conselheiro' ? 'Área do Conselheiro' : 'Área do Cliente'
 
   return (
     <header className="sticky top-0 z-30 border-b border-divisoria bg-creme/95 backdrop-blur">
@@ -27,30 +30,10 @@ export default function Cabecalho() {
 
         {/* Menu quando está no Painel de Usuário */}
         {estaNaAreaUsuario ? (
-          <nav aria-label="Navegação da área logada" className="hidden lg:flex items-center gap-6">
-            <div className="flex items-center gap-2 rounded-full border border-divisoria bg-white p-1 shadow-2xs">
-              <Link
-                to="/usuario/conselheiro"
-                className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
-                  estaNoPainelConselheiro
-                    ? 'bg-verde-petroleo text-white shadow-xs'
-                    : 'text-texto-secundario hover:text-verde-petroleo'
-                }`}
-              >
-                Área do Conselheiro
-              </Link>
-              <Link
-                to="/usuario/cliente"
-                className={`rounded-full px-4 py-1.5 text-sm font-bold transition ${
-                  estaNoPainelCliente
-                    ? 'bg-verde-petroleo text-white shadow-xs'
-                    : 'text-texto-secundario hover:text-verde-petroleo'
-                }`}
-              >
-                Área do Cliente
-              </Link>
-            </div>
-
+          <nav aria-label="Navegação da área logada" className="hidden items-center gap-6 lg:flex">
+            <span className="rounded-full bg-verde-petroleo px-4 py-1.5 text-sm font-bold text-white">
+              {nomeArea}
+            </span>
             <Link
               to="/"
               className="text-base font-semibold text-verde-titulo hover:underline"
@@ -75,12 +58,13 @@ export default function Cabecalho() {
 
         <div className="hidden items-center gap-4 lg:flex">
           {estaNaAreaUsuario ? (
-            <Link
-              to="/login"
+            <button
+              type="button"
+              onClick={sair}
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-divisoria bg-white px-5 text-sm font-bold text-texto-secundario hover:bg-campo hover:text-red-700"
             >
               Sair
-            </Link>
+            </button>
           ) : (
             <>
               <Link to="/login" className="text-lg font-semibold text-verde-titulo underline-offset-8 hover:underline">
@@ -109,24 +93,9 @@ export default function Cabecalho() {
         <nav id="menu-celular" aria-label="Menu principal" className="border-t border-divisoria bg-creme lg:hidden">
           {estaNaAreaUsuario ? (
             <div className="flex flex-col gap-2 p-5">
-              <Link
-                to="/usuario/conselheiro"
-                onClick={() => setMenuAberto(false)}
-                className={`flex min-h-12 items-center rounded-xl px-4 text-lg font-bold ${
-                  estaNoPainelConselheiro ? 'bg-verde-petroleo text-white' : 'text-verde-titulo hover:bg-campo'
-                }`}
-              >
-                Área do Conselheiro
-              </Link>
-              <Link
-                to="/usuario/cliente"
-                onClick={() => setMenuAberto(false)}
-                className={`flex min-h-12 items-center rounded-xl px-4 text-lg font-bold ${
-                  estaNoPainelCliente ? 'bg-verde-petroleo text-white' : 'text-verde-titulo hover:bg-campo'
-                }`}
-              >
-                Área do Cliente
-              </Link>
+              <span className="flex min-h-12 items-center rounded-xl bg-verde-petroleo px-4 text-lg font-bold text-white">
+                {nomeArea}
+              </span>
               <Link
                 to="/"
                 onClick={() => setMenuAberto(false)}
@@ -134,13 +103,16 @@ export default function Cabecalho() {
               >
                 Ir para a página inicial
               </Link>
-              <Link
-                to="/login"
-                onClick={() => setMenuAberto(false)}
+              <button
+                type="button"
                 className="mt-2 flex min-h-12 items-center justify-center rounded-xl border border-divisoria bg-white text-base font-bold text-red-700"
+                onClick={() => {
+                  setMenuAberto(false)
+                  sair()
+                }}
               >
                 Sair
-              </Link>
+              </button>
             </div>
           ) : (
             <>

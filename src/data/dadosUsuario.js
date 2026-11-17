@@ -22,7 +22,7 @@ export const dadosConselheiro = {
     clienteNome: 'Marcos Ribeiro',
     clienteNegocio: 'Padaria Central',
     clienteCidade: 'Aracaju, SE',
-    clienteFoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    clienteFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     data: 'Hoje, 10 de Novembro',
     horario: '14:00 – 15:00',
     emBreveTexto: 'Começa em 1h30',
@@ -107,7 +107,7 @@ export const dadosCliente = {
   tempoEmpreende: '2 anos',
   segmento: 'Alimentação & Panificação',
   cidade: 'Aracaju, SE',
-  foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+  foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
   proximaMentoria: {
     id: 'ment-01',
     especialistaId: 1,

@@ -1,11 +1,7 @@
-import {
-  Compass,
-  History,
-  Lightbulb,
-} from 'lucide-react'
+import { Compass, History, Lightbulb } from 'lucide-react'
 import { useState } from 'react'
 import { dadosCliente } from '../data/dadosUsuario'
-import MainLayout from '../layouts/MainLayout'
+import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
 import CabecalhoCliente from './usuario/cliente/CabecalhoCliente'
 import ConselheirosRecomendadosCliente from './usuario/cliente/ConselheirosRecomendadosCliente'
 import HistoricoMentoriasCliente from './usuario/cliente/HistoricoMentoriasCliente'
@@ -17,8 +13,8 @@ export default function UsuarioClientePage() {
   const [abaAtiva, setAbaAtiva] = useState('plano')
 
   return (
-    <MainLayout>
-      <div className="mx-auto max-w-[1240px] px-5 pb-24 pt-8 lg:px-8">
+    <AreaUsuarioLayout usuario={cliente}>
+      <div className="mx-auto max-w-275">
         {/* Banner de boas-vindas do Cliente Empreendedor */}
         <CabecalhoCliente cliente={cliente} />
 
@@ -114,6 +110,6 @@ export default function UsuarioClientePage() {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </AreaUsuarioLayout>
   )
 }
