@@ -1,6 +1,6 @@
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import BotaoLink from '../components/BotaoLink'
 import LogoSabios from '../components/LogoSabios'
 import useAuth from '../hooks/useAuth'
@@ -13,13 +13,11 @@ const linksPublicos = [
 
 export default function Cabecalho() {
   const [menuAberto, setMenuAberto] = useState(false)
-  const location = useLocation()
   const { perfil, sair } = useAuth()
 
-  const estaNaAreaUsuario =
-    Boolean(perfil) &&
-    (location.pathname.includes('/conselheiro') || location.pathname.includes('/cliente'))
+  const estaLogado = Boolean(perfil)
   const nomeArea = perfil === 'conselheiro' ? 'Área do Conselheiro' : 'Área do Cliente'
+  const rotaArea = perfil === 'conselheiro' ? '/usuario/conselheiro' : '/usuario/cliente'
 
   return (
     <header className="sticky top-0 z-30 border-b border-divisoria bg-creme/95 backdrop-blur">
@@ -29,13 +27,13 @@ export default function Cabecalho() {
         </Link>
 
         {/* Menu quando está no Painel de Usuário */}
-        {estaNaAreaUsuario ? (
+        {estaLogado ? (
           <nav aria-label="Navegação da área logada" className="hidden items-center gap-6 lg:flex">
             <span className="rounded-full bg-verde-petroleo px-4 py-1.5 text-sm font-bold text-white">
               {nomeArea}
             </span>
             <Link
-              to="/"
+              to={rotaArea}
               className="text-base font-semibold text-verde-titulo hover:underline"
             >
               Ir para o site
@@ -57,7 +55,7 @@ export default function Cabecalho() {
         )}
 
         <div className="hidden items-center gap-4 lg:flex">
-          {estaNaAreaUsuario ? (
+          {estaLogado ? (
             <button
               type="button"
               onClick={sair}
@@ -91,17 +89,17 @@ export default function Cabecalho() {
 
       {menuAberto && (
         <nav id="menu-celular" aria-label="Menu principal" className="border-t border-divisoria bg-creme lg:hidden">
-          {estaNaAreaUsuario ? (
+          {estaLogado ? (
             <div className="flex flex-col gap-2 p-5">
               <span className="flex min-h-12 items-center rounded-xl bg-verde-petroleo px-4 text-lg font-bold text-white">
                 {nomeArea}
               </span>
               <Link
-                to="/"
+                to={rotaArea}
                 onClick={() => setMenuAberto(false)}
                 className="flex min-h-12 items-center rounded-xl px-4 text-base font-semibold text-texto-secundario hover:bg-campo"
               >
-                Ir para a página inicial
+                Ir para minha área
               </Link>
               <button
                 type="button"

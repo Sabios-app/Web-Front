@@ -15,7 +15,7 @@ export default function CabecalhoUsuario({ usuario, tipoUsuario, menu }) {
           <img src={usuario.foto} alt="" className="h-12 w-12 rounded-full object-cover" />
         </div>
       </div>
-      <nav aria-label="Navegação rápida" className="flex gap-2 overflow-x-auto px-5 pb-3 lg:hidden">
+      <nav aria-label="Navegação rápida" className="sem-barra-rolagem flex gap-2 overflow-x-auto px-5 pb-3 lg:hidden">
         {menu.map((item) => (
           <LinkMenuUsuario key={`${item.texto}-mobile`} item={item} mobile />
         ))}

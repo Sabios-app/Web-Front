@@ -5,6 +5,7 @@ import AgendaCliente from './usuario/cliente/AgendaCliente'
 import MensagensCliente from './usuario/cliente/MensagensCliente'
 import AgendaConselheiro from './usuario/conselheiro/AgendaConselheiro'
 import AvaliacoesConselheiro from './usuario/conselheiro/AvaliacoesConselheiro'
+import MensagensConselheiro from './usuario/conselheiro/MensagensConselheiro'
 import SolicitacoesPendentesConselheiro from './usuario/conselheiro/SolicitacoesPendentesConselheiro'
 import ConfiguracoesUsuario from './usuario/compartilhado/ConfiguracoesUsuario'
 import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
@@ -19,6 +20,7 @@ const titulos = {
   conselheiro: {
     agenda: 'Minha agenda',
     solicitacoes: 'Solicitações pendentes',
+    mensagens: 'Mensagens',
     avaliacoes: 'Avaliações recebidas',
     perfil: 'Configurações',
   },
@@ -42,14 +44,15 @@ function ConteudoConselheiro({ secao, usuario }) {
       <SolicitacoesPendentesConselheiro solicitacoesIniciais={usuario.solicitacoesPendentes} />
     ),
     avaliacoes: <AvaliacoesConselheiro avaliacoes={usuario.avaliacoesRecentes} />,
+    mensagens: <MensagensConselheiro />,
     perfil: <ConfiguracoesUsuario perfil="conselheiro" usuario={usuario} />,
   }
 
   return secoes[secao] ?? null
 }
 
-export default function AreaUsuarioSecaoPage() {
-  const { perfil, secao } = useParams()
+export default function AreaUsuarioSecaoPage({ perfil }) {
+  const { secao } = useParams()
   const usuario = perfil === 'cliente' ? dadosCliente : dadosConselheiro
   const titulo = titulos[perfil]?.[secao] ?? 'Área do usuário'
   const conteudo =

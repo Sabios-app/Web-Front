@@ -48,20 +48,22 @@ export default function UsuarioClientePage() {
     <AreaUsuarioLayout usuario={cliente}>
       <div className="mx-auto max-w-275">
         {/* Banner de boas-vindas do Cliente Empreendedor */}
-        <CabecalhoCliente cliente={cliente} />
+        <div className="motion-safe:animate-aparecer">
+          <CabecalhoCliente cliente={cliente} />
+        </div>
 
         {/* Próxima Mentoria (Destaque principal) */}
-        <div className="mt-8">
+        <div className="mt-8 motion-safe:animate-aparecer [animation-delay:100ms]">
           <ProximaMentoriaCliente mentoria={cliente.proximaMentoria} />
         </div>
 
         {/* Plano de Ação das Mentorias */}
-        <div className="mt-8">
+        <div className="mt-8 motion-safe:animate-aparecer [animation-delay:180ms]">
           <PlanoDeAcaoCliente acoesIniciais={cliente.planoDeAcao} />
         </div>
 
         {/* Abas: Conselheiros Recomendados & Histórico */}
-        <div className="mt-10">
+        <div className="mt-10 motion-safe:animate-aparecer [animation-delay:260ms]">
           <NavegacaoAbas abas={abas} abaAtiva={abaAtiva} aoSelecionar={setAbaAtiva} />
 
           <div className="mt-6">

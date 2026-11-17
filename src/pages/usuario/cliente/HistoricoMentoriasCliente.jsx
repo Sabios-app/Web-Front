@@ -29,8 +29,8 @@ export default function HistoricoMentoriasCliente({ historico }) {
                   <h3 className="font-titulo text-lg font-bold text-verde-titulo">
                     {h.especialistaNome}
                   </h3>
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800">
-                    <CheckCircle2 size={13} className="text-emerald-700" /> Realizada em {h.data}
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-verde-icone">
+                    <CheckCircle2 size={13} className="text-verde-icone" /> Realizada em {h.data}
                   </span>
                 </div>
 
