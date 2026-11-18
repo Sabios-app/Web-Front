@@ -7,12 +7,9 @@ Aplicação web desenvolvida com **React 19**, **Vite** e **Tailwind CSS**, estr
 
 ## 📚 Documentação relacionada
 
-- [Frontend Web](https://github.com/Sabios-app/Web-Front/blob/main/README.md) — aplicação web do ecossistema Sábios.
+- [Frontend Mobile](https://github.com/Sabios-app/Mobile/blob/main/README.md) — aplicação web do ecossistema Sábios.
 - [Backend da API](https://github.com/Sabios-app/Api-Backend/blob/main/README.md) — serviço responsável pelas
   integrações de backend.
-
----
-
 
 ---
 
