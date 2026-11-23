@@ -1,4 +1,4 @@
-import { Search, Star } from 'lucide-react'
+import { ChevronDown, Search, Star } from 'lucide-react'
 import { buscasFrequentes, imagens } from './dadosHome'
 
 export default function SecaoInicio() {
@@ -90,6 +90,21 @@ export default function SecaoInicio() {
             <p className="text-sm text-white/85">avaliação média</p>
           </div>
         </div>
+      </div>
+
+      <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 lg:bottom-6">
+        <a
+          href="#como-funciona"
+          aria-label="Ir para a secao Como funciona"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-dourado/50 bg-creme text-dourado-escuro shadow-[0_8px_24px_rgba(23,59,58,.12)] transition-colors hover:bg-dourado-aviso"
+        >
+          <ChevronDown
+            aria-hidden="true"
+            size={26}
+            strokeWidth={2.5}
+            className="motion-safe:animate-seta-scroll motion-reduce:animate-none"
+          />
+        </a>
       </div>
     </section>
   )

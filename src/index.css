@@ -26,6 +26,7 @@
   --font-titulo: "Lora", serif;
   --font-corpo: "DM Sans", sans-serif;
  --animate-aparecer: aparecer 0.4s ease-out both;
+ --animate-seta-scroll: seta-scroll 1.6s ease-in-out infinite;
 
   @keyframes aparecer {
     from {
@@ -35,6 +36,15 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes seta-scroll {
+    0%, 100% {
+      transform: translateY(-3px);
+    }
+    50% {
+      transform: translateY(5px);
     }
   }
 
@@ -88,6 +98,27 @@ html[data-modo-simples] .so-completo {
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: var(--color-dourado) var(--color-creme);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-creme);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid var(--color-creme);
+  border-radius: 999px;
+  background: var(--color-dourado);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dourado-escuro);
 }
 
 /* Mantém a navegação horizontal acessível sem exibir uma barra que ocupa espaço no mobile. */

@@ -4,6 +4,39 @@
 
 O frontend foi refinado para ficar mais próximo do protótipo do Figma, com novas telas, rotas completas, melhorias na área do cliente e conselheiro, responsividade, estados de interface e autenticação persistente.
 
+## Atualização de 23/11/2026
+
+### Home e navegação
+
+- Adicionada uma seta animada no fim da seção inicial da home.
+- A seta leva o usuário para a seção “Como funciona”.
+- A animação respeita a preferência de movimento reduzido.
+- A barra de rolagem lateral recebeu as cores do tema: trilho creme e indicador dourado.
+
+### Autenticação e perfil
+
+- Corrigida a entrada automática na área logada após carregar o site.
+- A sessão agora é mantida somente durante a navegação ativa no front, sem persistência em `localStorage`.
+- Ao atualizar a página ou iniciar uma nova visita, o usuário permanece deslogado até fazer login.
+- A sessão real, permanência entre visitas e permissões continuam dependendo da integração com o backend.
+- Substituído o botão de saída da tela inicial por um botão **Meu perfil**.
+- Os botões de saída foram removidos das barras lateral e superior da área do usuário.
+- O logout foi centralizado em **Configurações**.
+
+### Login e cadastro
+
+- Adicionado o botão **Voltar ao início** no layout compartilhado de login e cadastro.
+- O botão está disponível nas telas de login, escolha de perfil, cadastro de cliente, cadastro de conselheiro e recuperação de senha.
+
+### Notificações
+
+- Implementado o funcionamento do sino na barra da área do usuário.
+- O sino abre um painel com notificações recentes.
+- Cada notificação pode ser marcada como lida.
+- Disponível a ação **Marcar todas como lidas**.
+- As notificações direcionam para Mensagens ou Agenda.
+- O painel fecha ao clicar fora ou pressionar `Esc`.
+
 ## Funcionalidades adicionadas
 
 ### Especialistas
@@ -52,10 +85,11 @@ O frontend foi refinado para ficar mais próximo do protótipo do Figma, com nov
 
 ### Autenticação e navegação
 
-- A sessão continua salva em `localStorage` através da chave `sabios:perfil`.
-- Usuários autenticados permanecem identificados ao acessar a página inicial.
+- A sessão do protótipo não persiste em `localStorage`.
+- Ao iniciar uma nova visita ou atualizar o navegador, o usuário fica deslogado.
+- Os usuários autenticados permanecem identificados apenas durante a navegação ativa no front.
 - A navegação pública da home é substituída pela navegação da área logada.
-- O botão de saída permanece disponível até o usuário encerrar a sessão.
+- O botão de saída fica disponível apenas na seção de configurações.
 
 ### Mensagens
 
@@ -76,6 +110,9 @@ O frontend foi refinado para ficar mais próximo do protótipo do Figma, com nov
 - `src/pages/usuario/compartilhado/ConfiguracoesUsuario.jsx`
 - `src/pages/AreaUsuarioSecaoPage.jsx`
 - `src/layouts/Cabecalho.jsx`
+- `src/layouts/AuthLayout.jsx`
+- `src/layouts/CabecalhoUsuario.jsx`
+- `src/components/usuario/BotaoNotificacoes.jsx`
 - `src/routes/AppRoutes.jsx`
 - `src/data/menusUsuario.js`
 - `src/index.css`
