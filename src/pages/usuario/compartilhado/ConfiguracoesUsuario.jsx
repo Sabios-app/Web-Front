@@ -1,11 +1,20 @@
-import { Bell, Eye, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react'
+import { Bell, Eye, LockKeyhole, LogOut, ShieldCheck, UserRound } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAcessibilidade } from '../../../hooks/useAcessibilidade'
+import useAuth from '../../../hooks/useAuth'
 import OpcaoConfiguracao from './OpcaoConfiguracao'
 
 export default function ConfiguracoesUsuario({ perfil, usuario }) {
   const [notificacoes, setNotificacoes] = useState(true)
   const a11y = useAcessibilidade()
+  const { sair } = useAuth()
+  const navigate = useNavigate()
+
+  function encerrarSessao() {
+    sair()
+    navigate('/login')
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -107,6 +116,14 @@ export default function ConfiguracoesUsuario({ perfil, usuario }) {
         <p className="mt-3 text-texto-secundario">
           Suas preferências ficam salvas neste dispositivo e podem ser alteradas quando quiser.
         </p>
+        <button
+          type="button"
+          onClick={encerrarSessao}
+          className="mt-6 flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 text-base font-bold text-red-700 hover:bg-red-100"
+        >
+          <LogOut size={20} aria-hidden="true" />
+          Sair da conta
+        </button>
       </aside>
     </div>
   )

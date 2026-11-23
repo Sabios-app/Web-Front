@@ -13,11 +13,12 @@ const linksPublicos = [
 
 export default function Cabecalho() {
   const [menuAberto, setMenuAberto] = useState(false)
-  const { perfil, sair } = useAuth()
+  const { perfil } = useAuth()
 
   const estaLogado = Boolean(perfil)
   const nomeArea = perfil === 'conselheiro' ? 'Área do Conselheiro' : 'Área do Cliente'
   const rotaArea = perfil === 'conselheiro' ? '/usuario/conselheiro' : '/usuario/cliente'
+  const rotaPerfil = perfil === 'conselheiro' ? '/usuario/conselheiro/perfil' : '/usuario/cliente/perfil'
 
   return (
     <header className="sticky top-0 z-30 border-b border-divisoria bg-creme/95 backdrop-blur">
@@ -56,13 +57,12 @@ export default function Cabecalho() {
 
         <div className="hidden items-center gap-4 lg:flex">
           {estaLogado ? (
-            <button
-              type="button"
-              onClick={sair}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-divisoria bg-white px-5 text-sm font-bold text-texto-secundario hover:bg-campo hover:text-red-700"
+            <Link
+              to={rotaPerfil}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-divisoria bg-white px-5 text-sm font-bold text-verde-titulo hover:bg-campo"
             >
-              Sair
-            </button>
+              Meu perfil
+            </Link>
           ) : (
             <>
               <Link to="/login" className="text-lg font-semibold text-verde-titulo underline-offset-8 hover:underline">
@@ -95,22 +95,12 @@ export default function Cabecalho() {
                 {nomeArea}
               </span>
               <Link
-                to={rotaArea}
+                to={rotaPerfil}
                 onClick={() => setMenuAberto(false)}
                 className="flex min-h-12 items-center rounded-xl px-4 text-base font-semibold text-texto-secundario hover:bg-campo"
               >
-                Ir para minha área
+                Meu perfil
               </Link>
-              <button
-                type="button"
-                className="mt-2 flex min-h-12 items-center justify-center rounded-xl border border-divisoria bg-white text-base font-bold text-red-700"
-                onClick={() => {
-                  setMenuAberto(false)
-                  sair()
-                }}
-              >
-                Sair
-              </button>
             </div>
           ) : (
             <>

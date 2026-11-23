@@ -7,7 +7,7 @@ export default function CabecalhoUsuario({ usuario, tipoUsuario, menu }) {
       <div className="flex min-h-24 items-center justify-between px-5 lg:px-10">
         <p className="text-base text-texto-secundario">Área do {tipoUsuario.toLowerCase()}</p>
         <div className="flex items-center gap-4">
-          <BotaoNotificacoes />
+          <BotaoNotificacoes tipoUsuario={tipoUsuario} />
           <div className="hidden text-right sm:block">
             <p className="font-bold text-verde-titulo">{usuario.nome}</p>
             <p className="text-sm text-texto-secundario">Configurações</p>
