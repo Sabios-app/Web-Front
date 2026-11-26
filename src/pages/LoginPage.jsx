@@ -1,26 +1,31 @@
-import { Briefcase, Star } from 'lucide-react'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Botao from '../components/Botao'
-import CampoTexto from '../components/CampoTexto'
-import useAuth from '../hooks/useAuth'
-import AuthLayout from '../layouts/AuthLayout'
+import { Briefcase, Star } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Botao from "../components/Botao";
+import CampoTexto from "../components/CampoTexto";
+import useAuth from "../hooks/useAuth";
+import AuthLayout from "../layouts/AuthLayout";
+import fotoLogin from "../assets/homeLogin.jpg";
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const { entrar } = useAuth()
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [tipoPerfil, setTipoPerfil] = useState('conselheiro')
+  const navigate = useNavigate();
+  const { entrar } = useAuth();
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [tipoPerfil, setTipoPerfil] = useState("conselheiro");
 
   function handleLogin(e) {
-    e.preventDefault()
-    entrar(tipoPerfil)
-    navigate(tipoPerfil === 'conselheiro' ? '/usuario/conselheiro' : '/usuario/cliente')
+    e.preventDefault();
+    entrar(tipoPerfil);
+    navigate(
+      tipoPerfil === "conselheiro"
+        ? "/usuario/conselheiro"
+        : "/usuario/cliente",
+    );
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout imagem={fotoLogin}>
       <div className="w-full max-w-md">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-dourado-escuro">
@@ -38,11 +43,11 @@ export default function LoginPage() {
         <div className="mt-6 rounded-2xl border border-divisoria bg-campo/60 p-1.5 flex gap-1">
           <button
             type="button"
-            onClick={() => setTipoPerfil('conselheiro')}
+            onClick={() => setTipoPerfil("conselheiro")}
             className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-              tipoPerfil === 'conselheiro'
-                ? 'bg-verde-petroleo text-white shadow-xs'
-                : 'text-texto-secundario hover:text-verde-petroleo'
+              tipoPerfil === "conselheiro"
+                ? "bg-verde-petroleo text-white shadow-xs"
+                : "text-texto-secundario hover:text-verde-petroleo"
             }`}
           >
             <Star size={16} />
@@ -50,11 +55,11 @@ export default function LoginPage() {
           </button>
           <button
             type="button"
-            onClick={() => setTipoPerfil('cliente')}
+            onClick={() => setTipoPerfil("cliente")}
             className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-              tipoPerfil === 'cliente'
-                ? 'bg-verde-petroleo text-white shadow-xs'
-                : 'text-texto-secundario hover:text-verde-petroleo'
+              tipoPerfil === "cliente"
+                ? "bg-verde-petroleo text-white shadow-xs"
+                : "text-texto-secundario hover:text-verde-petroleo"
             }`}
           >
             <Briefcase size={16} />
@@ -73,10 +78,16 @@ export default function LoginPage() {
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label htmlFor="senha" className="block text-base font-bold text-verde-titulo">
+              <label
+                htmlFor="senha"
+                className="block text-base font-bold text-verde-titulo"
+              >
                 Senha
               </label>
-              <Link to="/recuperar-senha" className="text-xs font-semibold text-dourado-escuro hover:underline">
+              <Link
+                to="/recuperar-senha"
+                className="text-xs font-semibold text-dourado-escuro hover:underline"
+              >
                 Esqueceu a senha?
               </Link>
             </div>
@@ -92,20 +103,24 @@ export default function LoginPage() {
 
           <div className="pt-2">
             <Botao type="submit">
-              Entrar como {tipoPerfil === 'conselheiro' ? 'Conselheiro' : 'Cliente'}
+              Entrar como{" "}
+              {tipoPerfil === "conselheiro" ? "Conselheiro" : "Cliente"}
             </Botao>
           </div>
         </form>
 
         <div className="mt-8 border-t border-divisoria pt-6 text-center">
           <p className="text-sm text-texto-secundario">
-            Ainda não tem cadastro?{' '}
-            <Link to="/cadastro" className="font-bold text-dourado-escuro hover:underline">
+            Ainda não tem cadastro?{" "}
+            <Link
+              to="/cadastro"
+              className="font-bold text-dourado-escuro hover:underline"
+            >
               Criar conta gratuita
             </Link>
           </p>
         </div>
       </div>
     </AuthLayout>
-  )
+  );
 }
