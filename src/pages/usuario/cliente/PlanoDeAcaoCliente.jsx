@@ -1,4 +1,4 @@
-import { CheckSquare, Plus, Square } from 'lucide-react'
+import { CheckSquare, ChevronDown, Plus, Square } from 'lucide-react'
 import { useState } from 'react'
 
 export default function PlanoDeAcaoCliente({ acoesIniciais }) {
@@ -51,72 +51,83 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
         </div>
       </div>
 
-      <div className="mt-4 h-2 w-full rounded-full bg-divisoria">
-        <div
-          className="h-full rounded-full bg-dourado transition-all duration-500 ease-suave motion-reduce:transition-none"
-          style={{ width: `${porcentagem}%` }}
-        />
-      </div>
+      <details className="group mt-6 border-t border-divisoria pt-5">
+        <summary className="flex cursor-pointer list-none items-center gap-3 rounded-xl text-sm font-bold text-verde-petroleo focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dourado-foco">
+          <span className="flex-1">Ver tarefas e adicionar ação</span>
+          <ChevronDown
+            size={20}
+            aria-hidden="true"
+            className="shrink-0 transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
+          />
+        </summary>
 
-      <div className="mt-6 space-y-3">
-        {acoes.map((a) => (
-          <div
-            key={a.id}
-            onClick={() => alternarAcao(a.id)}
-            className={`flex cursor-pointer items-start gap-3.5 rounded-2xl border p-4 transition ${
-              a.concluido
-                ? 'border-dourado-claro/60 bg-dourado-aviso/40 text-texto-secundario'
-                : 'border-divisoria bg-white hover:border-verde-petroleo'
-            }`}
-          >
-            <button
-              type="button"
-              className="mt-0.5 text-verde-petroleo shrink-0"
-              aria-label={a.concluido ? 'Marcar como pendente' : 'Marcar como concluída'}
-            >
-              {a.concluido ? (
-                <CheckSquare size={22} className="text-dourado-escuro" />
-              ) : (
-                <Square size={22} className="text-texto-secundario" />
-              )}
-            </button>
+        <div className="mt-4">
+          <div className="h-2 w-full rounded-full bg-divisoria">
+            <div
+              className="h-full rounded-full bg-dourado transition-all duration-500 ease-suave motion-reduce:transition-none"
+              style={{ width: `${porcentagem}%` }}
+            />
+          </div>
 
-            <div className="flex-1">
-              <p
-                className={`text-base font-semibold ${
-                  a.concluido ? 'line-through text-texto-secundario' : 'text-verde-titulo'
+          <div className="mt-5 space-y-3">
+            {acoes.map((a) => (
+              <div
+                key={a.id}
+                onClick={() => alternarAcao(a.id)}
+                className={`flex cursor-pointer items-start gap-3.5 rounded-2xl border p-4 transition ${
+                  a.concluido
+                    ? 'border-dourado-claro/60 bg-dourado-aviso/40 text-texto-secundario'
+                    : 'border-divisoria bg-white hover:border-verde-petroleo'
                 }`}
               >
-                {a.titulo}
-              </p>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-texto-secundario">
-                <span>Orientado por: <strong>{a.conselheiro}</strong></span>
-                <span>•</span>
-                <span className={a.concluido ? 'text-dourado-escuro font-bold' : 'text-dourado-escuro font-bold'}>
-                  {a.prazo}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                <button
+                  type="button"
+                  className="mt-0.5 shrink-0 text-verde-petroleo"
+                  aria-label={a.concluido ? 'Marcar como pendente' : 'Marcar como concluída'}
+                >
+                  {a.concluido ? (
+                    <CheckSquare size={22} className="text-dourado-escuro" />
+                  ) : (
+                    <Square size={22} className="text-texto-secundario" />
+                  )}
+                </button>
 
-      <form onSubmit={adicionarAcao} className="mt-6 flex flex-col gap-2 border-t border-divisoria pt-6 sm:flex-row">
-        <input
-          type="text"
-          value={novaAcao}
-          onChange={(e) => setNovaAcao(e.target.value)}
-          placeholder="Adicionar nova meta ou tarefa para seu negócio..."
-          className="h-12 flex-1 rounded-xl border border-divisoria bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 focus:ring-dourado-foco"
-        />
-        <button
-          type="submit"
-          className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-5 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
-        >
-          <Plus size={16} />
-          Adicionar
-        </button>
-      </form>
+                <div className="flex-1">
+                  <p
+                    className={`text-base font-semibold ${
+                      a.concluido ? 'line-through text-texto-secundario' : 'text-verde-titulo'
+                    }`}
+                  >
+                    {a.titulo}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-texto-secundario">
+                    <span>Orientado por: <strong>{a.conselheiro}</strong></span>
+                    <span>•</span>
+                    <span className="font-bold text-dourado-escuro">{a.prazo}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={adicionarAcao} className="mt-6 flex flex-col gap-2 border-t border-divisoria pt-6 sm:flex-row">
+            <input
+              type="text"
+              value={novaAcao}
+              onChange={(e) => setNovaAcao(e.target.value)}
+              placeholder="Adicionar nova meta ou tarefa para seu negócio..."
+              className="h-12 flex-1 rounded-xl border border-divisoria bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 focus:ring-dourado-foco"
+            />
+            <button
+              type="submit"
+              className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-5 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
+            >
+              <Plus size={16} aria-hidden="true" />
+              Adicionar
+            </button>
+          </form>
+        </div>
+      </details>
     </div>
   )
 }

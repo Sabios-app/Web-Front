@@ -53,17 +53,26 @@ export default function UsuarioClientePage() {
         </div>
 
         {/* Próxima Mentoria (Destaque principal) */}
-        <div className="mt-8 motion-safe:animate-aparecer [animation-delay:100ms]">
+        <div
+          className="mt-8 motion-safe:animate-aparecer"
+          style={{ animationDelay: '60ms' }}
+        >
           <ProximaMentoriaCliente mentoria={cliente.proximaMentoria} />
         </div>
 
         {/* Plano de Ação das Mentorias */}
-        <div className="mt-8 motion-safe:animate-aparecer [animation-delay:180ms]">
+        <div
+          className="mt-8 motion-safe:animate-aparecer"
+          style={{ animationDelay: '120ms' }}
+        >
           <PlanoDeAcaoCliente acoesIniciais={cliente.planoDeAcao} />
         </div>
 
         {/* Abas: Conselheiros Recomendados & Histórico */}
-        <div className="mt-10 motion-safe:animate-aparecer [animation-delay:260ms]">
+        <div
+          className="mt-10 motion-safe:animate-aparecer"
+          style={{ animationDelay: '180ms' }}
+        >
           <NavegacaoAbas abas={abas} abaAtiva={abaAtiva} aoSelecionar={setAbaAtiva} />
 
           <div className="mt-6">
