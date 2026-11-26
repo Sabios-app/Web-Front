@@ -6,6 +6,7 @@ import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
 import CampoTexto from '../components/CampoTexto'
 import useAuth from '../hooks/useAuth'
+import { specialistService } from '../services/sabiosServices'
 
 const AREAS_DISPONIVEIS = [
   'Finanças & Gestão',
@@ -17,14 +18,19 @@ const AREAS_DISPONIVEIS = [
 
 export default function CadastroConselheiroPage() {
   const navigate = useNavigate()
-  const { entrar } = useAuth()
+  const { cadastrar } = useAuth()
 
   // em qual etapa a pessoa está (1 ou 2)
   const [etapa, setEtapa] = useState(1)
+  const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(false)
 
   // tudo o que a pessoa digitou
   const [dados, setDados] = useState({
     nome: '',
+    email: '',
+    senha: '',
+    telefone: '',
     cargo: '',
     anos: '',
     areas: ['Finanças & Gestão'],
@@ -53,14 +59,41 @@ export default function CadastroConselheiroPage() {
     else setEtapa(1)
   }
 
-  function continuar(e) {
+  async function continuar(e) {
     e.preventDefault() // impede a página de recarregar
     if (etapa === 1) {
       setEtapa(2)
     } else {
-      // Cadastro finalizado: vai para o painel de conselheiro
-      entrar('conselheiro')
-      navigate('/usuario/conselheiro')
+      setErro('')
+      setCarregando(true)
+      try {
+        await cadastrar({
+          name: dados.nome,
+          email: dados.email,
+          password: dados.senha,
+          role: 'COUNSELOR',
+          phone: dados.telefone,
+        })
+
+        // Tenta registrar o perfil de especialista do conselheiro no backend
+        try {
+          const valorNumerico = parseFloat(dados.valorSessao.replace(',', '.')) || 150.0
+          await specialistService.createProfile({
+            bio: dados.sobre,
+            specialty: dados.areas.join(', '),
+            hourlyRate: valorNumerico,
+          })
+        } catch (perfilErr) {
+          console.warn('Perfil especialista será configurado no onboarding:', perfilErr)
+        }
+
+        navigate('/usuario/conselheiro')
+      } catch (err) {
+        const msg = err.response?.data?.message || 'Erro ao realizar cadastro de conselheiro.'
+        setErro(msg)
+      } finally {
+        setCarregando(false)
+      }
     }
   }
 
@@ -73,11 +106,17 @@ export default function CadastroConselheiroPage() {
           titulo={etapa === 1 ? 'Vamos começar pelo básico' : 'Conte-nos sobre sua trajetória'}
           subtitulo={
             etapa === 1
-              ? 'Preencha somente estas informações. Você poderá alterar tudo depois.'
+              ? 'Preencha seus dados de acesso e identificação.'
               : 'Essas informações ajudam clientes a encontrar a experiência certa.'
           }
           aoVoltar={voltar}
         />
+
+        {erro && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
+            {erro}
+          </div>
+        )}
 
         {etapa === 1 && (
           <div className="mt-8 flex flex-col gap-5">
@@ -88,6 +127,35 @@ export default function CadastroConselheiroPage() {
               valor={dados.nome}
               aoMudar={(e) => atualizar('nome', e.target.value)}
               obrigatorio
+            />
+            <CampoTexto
+              id="email"
+              rotulo="E-mail de acesso"
+              placeholder="seuemail@exemplo.com"
+              valor={dados.email}
+              aoMudar={(e) => atualizar('email', e.target.value)}
+              obrigatorio
+            />
+            <div>
+              <label htmlFor="senha" className="mb-2 block text-base font-bold text-verde-titulo">
+                Senha de acesso
+              </label>
+              <input
+                id="senha"
+                type="password"
+                required
+                value={dados.senha}
+                onChange={(e) => atualizar('senha', e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
+              />
+            </div>
+            <CampoTexto
+              id="telefone"
+              rotulo="Telefone / WhatsApp"
+              placeholder="(11) 99999-9999"
+              valor={dados.telefone}
+              aoMudar={(e) => atualizar('telefone', e.target.value)}
             />
             <CampoTexto
               id="cargo"
@@ -141,7 +209,7 @@ export default function CadastroConselheiroPage() {
                 value={dados.sobre}
                 onChange={(e) => atualizar('sobre', e.target.value)}
                 placeholder="Ex.: Fui diretora financeira por 32 anos. Hoje ajudo pequenos negócios a organizar o fluxo de caixa..."
-                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
+                className="w-full rounded-xl border border-divisoria bg-white p-4 text-base text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
                 required
               />
             </div>
@@ -155,7 +223,9 @@ export default function CadastroConselheiroPage() {
               obrigatorio
             />
 
-            <Botao type="submit">Concluir cadastro e acessar meu painel</Botao>
+            <Botao type="submit" desabilitado={carregando}>
+              {carregando ? 'Cadastrando...' : 'Concluir cadastro e acessar meu painel'}
+            </Botao>
           </div>
         )}
       </form>

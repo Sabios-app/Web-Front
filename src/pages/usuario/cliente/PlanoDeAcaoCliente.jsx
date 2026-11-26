@@ -1,28 +1,62 @@
 import { CheckSquare, Plus, Square } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { actionPlanService } from '../../../services/sabiosServices'
 
 export default function PlanoDeAcaoCliente({ acoesIniciais }) {
   const [acoes, setAcoes] = useState(acoesIniciais || [])
   const [novaAcao, setNovaAcao] = useState('')
 
-  function alternarAcao(id) {
+  useEffect(() => {
+    if (acoesIniciais && acoesIniciais.length > 0) {
+      setAcoes(acoesIniciais)
+    }
+  }, [acoesIniciais])
+
+  async function alternarAcao(id) {
+    // Atualização otimista
     setAcoes(
       acoes.map((a) => (a.id === id ? { ...a, concluido: !a.concluido } : a))
     )
+
+    // Se for um ID numérico da API, dispara chamada ao backend
+    if (typeof id === 'number' || !isNaN(Number(id))) {
+      try {
+        await actionPlanService.toggle(id)
+      } catch (err) {
+        console.warn('Erro ao atualizar plano no backend:', err)
+      }
+    }
   }
 
-  function adicionarAcao(e) {
+  async function adicionarAcao(e) {
     e.preventDefault()
     if (!novaAcao.trim()) return
-    const nova = {
+
+    const texto = novaAcao.trim()
+    const novoLocal = {
       id: `acao-${Date.now()}`,
-      titulo: novaAcao.trim(),
+      titulo: texto,
       prazo: 'Em andamento',
       concluido: false,
       conselheiro: 'Minha anotação',
     }
-    setAcoes([...acoes, nova])
+    setAcoes([...acoes, novoLocal])
     setNovaAcao('')
+
+    try {
+      const criado = await actionPlanService.create({
+        title: texto,
+        deadline: new Date().toISOString(),
+        conselheiroNome: 'Minha anotação',
+      })
+      if (criado && criado.id) {
+        setAcoes((prev) =>
+          prev.map((a) => (a.id === novoLocal.id ? { ...a, id: criado.id } : a))
+        )
+      }
+    } catch (err) {
+      console.warn('Erro ao persistir plano de ação no backend:', err)
+    }
   }
 
   const concluidas = acoes.filter((a) => a.concluido).length
