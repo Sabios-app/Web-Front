@@ -1,8 +1,16 @@
 import { ArrowRight, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { formatarNota, formatarReais } from '../../../data/especialistas'
+import { formatarNota, formatarReais } from '../../../utils/formatadores'
 
 export default function ConselheirosRecomendadosCliente({ conselheiros }) {
+  if (!conselheiros || conselheiros.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-divisoria p-8 text-center text-texto-secundario">
+        Nenhum conselheiro disponível no momento.
+      </div>
+    )
+  }
+
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {conselheiros.map((esp) => (
@@ -39,7 +47,7 @@ export default function ConselheirosRecomendadosCliente({ conselheiros }) {
             </p>
 
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {esp.temas.slice(0, 2).map((t) => (
+              {(esp.temas || []).slice(0, 2).map((t) => (
                 <span
                   key={t}
                   className="rounded-full bg-campo px-2.5 py-0.5 text-xs font-semibold text-verde-petroleo"

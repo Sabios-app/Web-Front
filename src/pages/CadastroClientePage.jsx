@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
-import AuthLayout from '../layouts/AuthLayout'
 import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
 import CampoTexto from '../components/CampoTexto'
+import AlertaFormulario from '../components/feedback/AlertaFormulario'
+import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
 import useAuth from '../hooks/useAuth'
+import AuthLayout from '../layouts/AuthLayout'
+import { extrairErrosDeCampo, parseApiError } from '../utils/apiError'
 
 const DESAFIOS_DISPONIVEIS = [
   'Organizar o fluxo de caixa',
@@ -15,16 +17,22 @@ const DESAFIOS_DISPONIVEIS = [
   'Planejar a expansão do negócio',
 ]
 
+const ALIASES_CADASTRO_CLIENTE = {
+  name: 'nome',
+  password: 'senha',
+  phone: 'telefone',
+}
+const CAMPOS_CADASTRO_CLIENTE = ['nome', 'email', 'senha', 'telefone']
+
 export default function CadastroClientePage() {
   const navigate = useNavigate()
   const { cadastrar } = useAuth()
 
-  // em qual etapa a pessoa está (1 ou 2)
   const [etapa, setEtapa] = useState(1)
   const [erro, setErro] = useState('')
+  const [errosCampos, setErrosCampos] = useState({})
   const [carregando, setCarregando] = useState(false)
 
-  // tudo o que a pessoa digitou
   const [dados, setDados] = useState({
     nome: '',
     email: '',
@@ -38,9 +46,11 @@ export default function CadastroClientePage() {
     tamanhoEquipe: '1 a 5 pessoas',
   })
 
-  // atualiza só o campo que mudou e mantém o resto
   function atualizar(campo, valor) {
-    setDados({ ...dados, [campo]: valor })
+    setDados((atual) => ({ ...atual, [campo]: valor }))
+    if (errosCampos[campo]) {
+      setErrosCampos((atual) => ({ ...atual, [campo]: '' }))
+    }
   }
 
   function alternarDesafio(desafio) {
@@ -59,27 +69,39 @@ export default function CadastroClientePage() {
   }
 
   async function continuar(e) {
-    e.preventDefault() // impede a página de recarregar
+    e.preventDefault()
     if (etapa === 1) {
-      setEtapa(2)
-    } else {
       setErro('')
-      setCarregando(true)
-      try {
-        await cadastrar({
-          name: dados.nome,
-          email: dados.email,
-          password: dados.senha,
-          role: 'CLIENT',
-          phone: dados.telefone,
-        })
-        navigate('/usuario/cliente')
-      } catch (err) {
-        const msg = err.response?.data?.message || 'Erro ao realizar cadastro. Verifique os dados.'
-        setErro(msg)
-      } finally {
-        setCarregando(false)
+      setEtapa(2)
+      return
+    }
+
+    setErro('')
+    setErrosCampos({})
+    setCarregando(true)
+    try {
+      await cadastrar({
+        name: dados.nome,
+        email: dados.email,
+        password: dados.senha,
+        role: 'CLIENT',
+        phone: dados.telefone,
+      })
+      navigate('/usuario/cliente')
+    } catch (err) {
+      const parsed = parseApiError(err, 'Erro ao realizar cadastro. Verifique os dados.')
+      const { errosCampos: campos, mensagemGeral } = extrairErrosDeCampo(
+        parsed,
+        ALIASES_CADASTRO_CLIENTE,
+        CAMPOS_CADASTRO_CLIENTE,
+      )
+      setErrosCampos(campos)
+      setErro(mensagemGeral)
+      if (Object.keys(campos).length > 0) {
+        setEtapa(1)
       }
+    } finally {
+      setCarregando(false)
     }
   }
 
@@ -98,11 +120,7 @@ export default function CadastroClientePage() {
           aoVoltar={voltar}
         />
 
-        {erro && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
-            {erro}
-          </div>
-        )}
+        <AlertaFormulario tipo="erro">{erro}</AlertaFormulario>
 
         {etapa === 1 && (
           <div className="mt-8 flex flex-col gap-5">
@@ -112,36 +130,36 @@ export default function CadastroClientePage() {
               placeholder="Digite seu nome completo"
               valor={dados.nome}
               aoMudar={(e) => atualizar('nome', e.target.value)}
+              erro={errosCampos.nome}
               obrigatorio
             />
             <CampoTexto
               id="email"
+              type="email"
               rotulo="E-mail de acesso"
               placeholder="seuemail@exemplo.com"
               valor={dados.email}
               aoMudar={(e) => atualizar('email', e.target.value)}
+              erro={errosCampos.email}
               obrigatorio
             />
-            <div>
-              <label htmlFor="senha" className="mb-2 block text-base font-bold text-verde-titulo">
-                Senha de acesso
-              </label>
-              <input
-                id="senha"
-                type="password"
-                required
-                value={dados.senha}
-                onChange={(e) => atualizar('senha', e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
-              />
-            </div>
+            <CampoTexto
+              id="senha"
+              type="password"
+              rotulo="Senha de acesso"
+              placeholder="Mínimo 6 caracteres"
+              valor={dados.senha}
+              aoMudar={(e) => atualizar('senha', e.target.value)}
+              erro={errosCampos.senha}
+              obrigatorio
+            />
             <CampoTexto
               id="telefone"
               rotulo="Telefone / WhatsApp"
               placeholder="(11) 99999-9999"
               valor={dados.telefone}
               aoMudar={(e) => atualizar('telefone', e.target.value)}
+              erro={errosCampos.telefone}
             />
             <CampoTexto
               id="negocio"

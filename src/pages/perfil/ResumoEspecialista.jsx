@@ -1,8 +1,10 @@
 import { MapPin, Star } from 'lucide-react'
-import { formatarNota } from '../../data/especialistas'
+import { formatarNota } from '../../utils/formatadores'
 
 /** Topo do perfil: foto, nome, área, avaliação, cidade e temas. */
 export default function ResumoEspecialista({ especialista }) {
+  const temas = especialista.temas || []
+
   return (
     <div className="flex flex-col gap-6 rounded-3xl bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:p-8">
       <div className="relative mx-auto w-40 shrink-0 sm:mx-0 sm:w-48">
@@ -28,18 +30,22 @@ export default function ResumoEspecialista({ especialista }) {
             <strong>{formatarNota(especialista.avaliacao)}</strong>
             <span className="text-texto-secundario">({especialista.totalAvaliacoes} avaliações)</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 text-texto-secundario">
-            <MapPin aria-hidden="true" size={20} />
-            {especialista.cidade}
-          </span>
+          {especialista.cidade && (
+            <span className="inline-flex items-center gap-1.5 text-texto-secundario">
+              <MapPin aria-hidden="true" size={20} />
+              {especialista.cidade}
+            </span>
+          )}
         </p>
-        <ul aria-label="Temas" className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
-          {especialista.temas.map((tema) => (
-            <li key={tema} className="rounded-full bg-campo px-4 py-1.5 font-semibold text-verde-titulo">
-              {tema}
-            </li>
-          ))}
-        </ul>
+        {temas.length > 0 && (
+          <ul aria-label="Temas" className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
+            {temas.map((tema) => (
+              <li key={tema} className="rounded-full bg-campo px-4 py-1.5 font-semibold text-verde-titulo">
+                {tema}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )
