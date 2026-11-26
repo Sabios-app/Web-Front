@@ -1,5 +1,5 @@
-import { ChevronDown, Search, Star } from 'lucide-react'
-import { buscasFrequentes, imagens } from './dadosHome'
+import { ChevronDown, Search, Star } from "lucide-react";
+import { buscasFrequentes, imagens } from "./dadosHome";
 
 export default function SecaoInicio() {
   return (
@@ -12,20 +12,23 @@ export default function SecaoInicio() {
 
       <div className="mx-auto grid max-w-310 items-center gap-12 px-5 pb-16 pt-12 lg:grid-cols-[1.05fr_.95fr] lg:px-8 lg:py-20">
         <div className="relative z-10">
-          <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-dourado/50 bg-dourado-aviso px-4 py-2 text-sm font-extrabold uppercase tracking-[.16em] text-dourado-texto">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-dourado" />
+          <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-dourado/50 bg-dourado-aviso px-4 py-2 text-sm font-extrabold uppercase tracking-[.16em] text-dourado-texto motion-safe:animate-aparecer">
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 rounded-full bg-dourado"
+            />
             Experiência que transforma
           </p>
 
-          <h1 className="max-w-170 font-titulo text-5xl font-medium leading-[1.06] tracking-tight text-verde-titulo sm:text-6xl lg:text-[72px]">
+          <h1 className="max-w-170 font-titulo text-5xl font-medium leading-[1.06] tracking-tight text-verde-titulo sm:text-6xl lg:text-[72px] motion-safe:animate-aparecer [animation-delay:120ms]">
             Quem já viveu,
             <br />
             <em className="font-normal text-dourado-escuro">sabe o caminho.</em>
           </h1>
 
-          <p className="mt-6 max-w-147.5 text-xl leading-relaxed text-texto-secundario">
-            Conectamos você a profissionais sêniores que transformam décadas de experiência em decisões melhores
-            para o seu negócio.
+          <p className="mt-6 max-w-147.5 text-xl leading-relaxed text-texto-secundario motion-safe:animate-aparecer [animation-delay:240ms]">
+            Conectamos você a profissionais sêniores que transformam décadas de
+            experiência em decisões melhores para o seu negócio.
           </p>
 
           <form
@@ -37,7 +40,11 @@ export default function SecaoInicio() {
               Qual desafio você quer resolver?
             </label>
             <div className="flex flex-1 items-center gap-3 px-4">
-              <Search aria-hidden="true" size={22} className="shrink-0 text-dourado-escuro" />
+              <Search
+                aria-hidden="true"
+                size={22}
+                className="shrink-0 text-dourado-escuro"
+              />
               <input
                 id="busca-desafio"
                 name="busca"
@@ -55,7 +62,9 @@ export default function SecaoInicio() {
           </form>
 
           <div className="so-completo mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span className="font-bold text-verde-titulo">Buscas frequentes:</span>
+            <span className="font-bold text-verde-titulo">
+              Buscas frequentes:
+            </span>
             {buscasFrequentes.map((termo) => (
               <a
                 key={termo}
@@ -68,7 +77,7 @@ export default function SecaoInicio() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-135 lg:mr-0">
+        <div className="relative mx-auto w-full max-w-135 lg:mr-0 motion-safe:animate-aparecer [animation-delay:360ms]">
           {/* Forma dourada atrás da foto */}
           <div
             aria-hidden="true"
@@ -107,5 +116,5 @@ export default function SecaoInicio() {
         </a>
       </div>
     </section>
-  )
+  );
 }
