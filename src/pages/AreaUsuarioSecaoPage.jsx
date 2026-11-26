@@ -11,6 +11,7 @@ import {
 } from '../utils/especialistaMapper'
 import { formatarDataBR } from '../utils/formatadores'
 import AgendaCliente from './usuario/cliente/AgendaCliente'
+import AvaliacoesCliente from './usuario/cliente/AvaliacoesCliente'
 import MensagensCliente from './usuario/cliente/MensagensCliente'
 import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
 import ConfiguracoesUsuario from './usuario/compartilhado/ConfiguracoesUsuario'
@@ -23,6 +24,7 @@ const titulos = {
   cliente: {
     agenda: 'Minha agenda',
     plano: 'Meu plano de ação',
+    avaliacoes: 'Minhas avaliações',
     mensagens: 'Mensagens',
     perfil: 'Configurações',
   },
@@ -39,6 +41,7 @@ function ConteudoCliente({ secao, usuario, planoVersao }) {
   const secoes = {
     agenda: <AgendaCliente usuario={usuario} />,
     plano: <PlanoDeAcaoCliente key={planoVersao} acoesIniciais={usuario.planoDeAcao} />,
+    avaliacoes: <AvaliacoesCliente />,
     mensagens: <MensagensCliente />,
     perfil: <ConfiguracoesUsuario perfil="cliente" usuario={usuario} />,
   }
@@ -99,8 +102,18 @@ export default function AreaUsuarioSecaoPage({ perfil }) {
           planos.map((p) => ({
             id: p.id,
             titulo: p.title,
-            prazo: p.deadline ? formatarDataBR(p.deadline) : 'Em andamento',
+            // prefer dueDate, fall back to legacy deadline
+            dueDate: p.dueDate ?? null,
+            prazo: p.dueDate
+              ? new Date(p.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+              : p.deadline
+              ? formatarDataBR(p.deadline)
+              : 'Sem prazo',
             concluido: Boolean(p.completed),
+            overdue: Boolean(p.overdue),
+            assignedByCounselor: Boolean(p.assignedByCounselor),
+            completedAt: p.completedAt ?? null,
+            mentoringId: p.mentoringId ?? null,
             conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
           })),
         )

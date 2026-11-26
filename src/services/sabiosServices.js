@@ -11,7 +11,7 @@ export const authService = {
       name,
       email,
       password,
-      role: role.toUpperCase(), // CLIENT ou COUNSELOR
+      role: role.toUpperCase(),
       phone,
     })
     return response.data
@@ -60,8 +60,15 @@ export const mentoringService = {
     return response.data
   },
 
-  async listMyMentorings() {
-    const response = await api.get('/mentorings')
+  /**
+   * Lista mentorias com filtros opcionais.
+   * @param {{ scope?: 'HISTORY'|'UPCOMING', status?: string, page?: number, size?: number }} opts
+   */
+  async listMyMentorings({ scope, status, page = 0, size = 20 } = {}) {
+    const params = { page, size }
+    if (scope) params.scope = scope
+    if (status) params.status = status
+    const response = await api.get('/mentorings', { params })
     return response.data
   },
 
@@ -82,18 +89,161 @@ export const mentoringService = {
 }
 
 export const actionPlanService = {
-  async list() {
-    const response = await api.get('/action-plans')
+  /**
+   * Lista planos de ação.
+   * @param {{ completed?: boolean, overdue?: boolean, mentoringId?: string|number }} filters
+   */
+  async list(filters = {}) {
+    const params = { ...filters }
+    const response = await api.get('/action-plans', { params })
     return response.data
   },
 
-  async create({ title, deadline, conselheiroNome }) {
-    const response = await api.post('/action-plans', { title, deadline, conselheiroNome })
+  /**
+   * Cria plano de ação.
+   * @param {{ title: string, dueDate?: string, conselheiroNome?: string, mentoringId?: string|number }} payload
+   */
+  async create({ title, dueDate, conselheiroNome, mentoringId }) {
+    const payload = { title }
+    if (conselheiroNome) payload.conselheiroNome = conselheiroNome
+    if (dueDate) payload.dueDate = dueDate
+    if (mentoringId) payload.mentoringId = mentoringId
+    // backward compat — legacy deadline field
+    if (!dueDate) payload.deadline = new Date().toISOString()
+    const response = await api.post('/action-plans', payload)
+    return response.data
+  },
+
+  /**
+   * Conselheiro atribui tarefa a uma mentoria.
+   * @param {string|number} mentoringId
+   * @param {{ title: string, dueDate?: string }} data
+   */
+  async assignToMentoring(mentoringId, { title, dueDate }) {
+    const payload = { title }
+    if (dueDate) payload.dueDate = dueDate
+    const response = await api.post(`/action-plans/mentorings/${mentoringId}`, payload)
+    return response.data
+  },
+
+  /**
+   * Lista tarefas de uma mentoria específica.
+   */
+  async listByMentoring(mentoringId) {
+    const response = await api.get(`/action-plans/mentorings/${mentoringId}`)
+    return response.data
+  },
+
+  /**
+   * Edita título e/ou prazo de uma tarefa (somente quem criou).
+   */
+  async update(id, data) {
+    const response = await api.patch(`/action-plans/${id}`, data)
+    return response.data
+  },
+
+  /**
+   * Remove uma tarefa (somente quem criou — 403 se for do conselheiro).
+   */
+  async delete(id) {
+    const response = await api.delete(`/action-plans/${id}`)
     return response.data
   },
 
   async toggle(id) {
     const response = await api.patch(`/action-plans/${id}/toggle`)
+    return response.data
+  },
+}
+
+export const reviewService = {
+  /**
+   * Mentorias concluídas ainda sem avaliação.
+   */
+  async getPending() {
+    const response = await api.get('/reviews/pending')
+    return response.data
+  },
+
+  /**
+   * Avaliações feitas pelo usuário autenticado.
+   */
+  async getMy() {
+    const response = await api.get('/reviews/me')
+    return response.data
+  },
+
+  /**
+   * Cria uma avaliação.
+   * @param {{ mentoringId: string|number, rating: number, comment?: string }} data
+   */
+  async create({ mentoringId, rating, comment }) {
+    const payload = { mentoringId, rating }
+    if (comment) payload.comment = comment
+    const response = await api.post('/reviews', payload)
+    return response.data
+  },
+
+  /**
+   * Edita nota e/ou comentário de uma avaliação existente.
+   */
+  async update(id, { rating, comment }) {
+    const payload = {}
+    if (rating !== undefined) payload.rating = rating
+    if (comment !== undefined) payload.comment = comment
+    const response = await api.patch(`/reviews/${id}`, payload)
+    return response.data
+  },
+
+  async delete(id) {
+    const response = await api.delete(`/reviews/${id}`)
+    return response.data
+  },
+}
+
+export const notificationService = {
+  /**
+   * @param {{ unreadOnly?: boolean, page?: number, size?: number }} opts
+   */
+  async list({ unreadOnly, page = 0, size = 20 } = {}) {
+    const params = { page, size }
+    if (unreadOnly !== undefined) params.unreadOnly = unreadOnly
+    const response = await api.get('/notifications', { params })
+    return response.data
+  },
+
+  async getUnreadCount() {
+    const response = await api.get('/notifications/unread-count')
+    return response.data
+  },
+
+  async markRead(id) {
+    const response = await api.patch(`/notifications/${id}/read`)
+    return response.data
+  },
+
+  async markAllRead() {
+    const response = await api.patch('/notifications/read-all')
+    return response.data
+  },
+}
+
+export const messageService = {
+  async listConversations() {
+    const response = await api.get('/messages/conversations')
+    return response.data
+  },
+
+  async getConversation(id) {
+    const response = await api.get(`/messages/conversations/${id}`)
+    return response.data
+  },
+
+  /**
+   * @param {{ specialistId: string|number, content: string }} data
+   */
+  async send({ specialistId, content }) {
+    const response = await api.post('/messages', { specialistId, content })
     return response.data
   },
 }

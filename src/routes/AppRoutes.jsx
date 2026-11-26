@@ -66,7 +66,7 @@ export default function AppRoutes() {
             </RotaProtegida>
           }
         />
-        {['agenda', 'plano', 'mensagens', 'perfil'].map((secao) => (
+        {['agenda', 'plano', 'avaliacoes', 'mensagens', 'perfil'].map((secao) => (
           <Route
             key={`cliente-${secao}`}
             path="/usuario/cliente/:secao"
