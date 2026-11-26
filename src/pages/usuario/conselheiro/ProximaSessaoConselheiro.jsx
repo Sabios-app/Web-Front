@@ -1,5 +1,7 @@
 import { Clock, HelpCircle, MessageSquare, Video } from 'lucide-react'
 import { useState } from 'react'
+import BadgeStatusMentoria from '../../../components/mentoria/BadgeStatusMentoria'
+import { obterInfoStatusMentoria } from '../../../utils/mentoriaStatus'
 
 export default function ProximaSessaoConselheiro({ sessao }) {
   const [mostrarNotas, setMostrarNotas] = useState(false)
@@ -8,6 +10,9 @@ export default function ProximaSessaoConselheiro({ sessao }) {
   )
 
   if (!sessao) return null
+
+  const infoStatus = obterInfoStatusMentoria(sessao.status)
+  const podeExibirLink = Boolean(sessao.linkChamada) && !infoStatus.encerrada
 
   return (
     <div className="overflow-hidden rounded-3xl border-2 border-verde-petroleo/20 bg-white shadow-md">
@@ -18,9 +23,14 @@ export default function ProximaSessaoConselheiro({ sessao }) {
             Próxima Mentoria Agendada
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-semibold text-emerald-950">
-          <Clock size={16} aria-hidden="true" />
-          <span>{sessao.emBreveTexto}</span>
+        <div className="flex items-center gap-2">
+          {sessao.status && <BadgeStatusMentoria status={sessao.status} />}
+          {sessao.emBreveTexto && (
+            <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-semibold text-emerald-950">
+              <Clock size={16} aria-hidden="true" />
+              <span>{sessao.emBreveTexto}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -49,15 +59,22 @@ export default function ProximaSessaoConselheiro({ sessao }) {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a
-              href={sessao.linkChamada}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-verde-petroleo px-7 text-base font-bold text-white shadow-sm transition-colors hover:bg-verde-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado-foco"
-            >
-              <Video size={20} aria-hidden="true" />
-              Entrar na chamada
-            </a>
+            {podeExibirLink ? (
+              <a
+                href={sessao.linkChamada}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-verde-petroleo px-7 text-base font-bold text-white shadow-sm transition-colors hover:bg-verde-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado-foco"
+              >
+                <Video size={20} aria-hidden="true" />
+                Entrar na chamada
+              </a>
+            ) : !infoStatus.encerrada ? (
+              <p className="inline-flex min-h-14 items-center gap-2 rounded-full border border-divisoria bg-campo px-5 text-sm font-semibold text-texto-secundario">
+                <Video size={18} aria-hidden="true" />
+                O conselheiro ainda não informou o link
+              </p>
+            ) : null}
 
             <button
               type="button"

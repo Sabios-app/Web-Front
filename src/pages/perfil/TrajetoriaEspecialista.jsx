@@ -1,7 +1,17 @@
 import CartaoSecao from './CartaoSecao'
 
 /** Linha do tempo com os cargos mais importantes da carreira. */
-export default function TrajetoriaEspecialista({ trajetoria }) {
+export default function TrajetoriaEspecialista({ trajetoria = [] }) {
+  if (!trajetoria || trajetoria.length === 0) {
+    return (
+      <CartaoSecao titulo="Trajetória">
+        <p className="text-base text-texto-secundario">
+          Experiência profissional informada no resumo acima.
+        </p>
+      </CartaoSecao>
+    )
+  }
+
   return (
     <CartaoSecao titulo="Trajetória">
       <ol className="flex flex-col gap-6">

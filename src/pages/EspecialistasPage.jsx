@@ -3,9 +3,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import CartaoEspecialista from '../components/CartaoEspecialista'
 import EstadoInterface from '../components/EstadoInterface'
-import { especialistas as mockEspecialistas } from '../data/especialistas'
-import { specialistService } from '../services/sabiosServices'
 import MainLayout from '../layouts/MainLayout'
+import { specialistService } from '../services/sabiosServices'
+import { parseApiError } from '../utils/apiError'
+import {
+  extrairListaPaginada,
+  mapearEspecialistaApi,
+} from '../utils/especialistaMapper'
 
 const AREAS_PADRAO = [
   'Todas as áreas',
@@ -25,45 +29,44 @@ export default function EspecialistasPage() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
   const [listaEspecialistas, setListaEspecialistas] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  const [tentativa, setTentativa] = useState(0)
 
   useEffect(() => {
-    async function carregarEspecialistas() {
-      try {
-        setCarregando(true)
-        const params = {}
-        if (busca.trim()) params.search = busca.trim()
-        if (area !== 'Todas as áreas') params.specialty = area
-        const response = await specialistService.listSpecialists(params)
+    let ativo = true
+    const params = {}
+    if (busca.trim()) params.search = busca.trim()
+    if (area !== 'Todas as áreas') params.specialty = area
 
-        if (response && response.content && response.content.length > 0) {
-          // Converte do modelo da API para o formato esperado pelos cards
-          const mapeados = response.content.map((esp) => ({
-            id: esp.id,
-            nome: esp.user?.name || esp.name || 'Conselheiro Sábios',
-            area: esp.specialty || 'Consultoria Geral',
-            cidade: 'Brasil',
-            foto: esp.user?.avatarUrl || esp.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-            avaliacao: esp.rating || 5.0,
-            totalAvaliacoes: esp.totalReviews || 1,
-            valorSessao: esp.hourlyRate || 150.0,
-            descricao: esp.bio || 'Conselheiro experiente pronto para apoiar o seu negócio.',
-            temas: esp.specialty ? esp.specialty.split(',').map((t) => t.trim()) : ['Estratégia'],
-          }))
-          setListaEspecialistas(mapeados)
-        } else {
-          // Fallback para os mocks estáticos se ainda não houver nenhum conselheiro cadastrado no banco
-          setListaEspecialistas(mockEspecialistas)
-        }
-      } catch (err) {
-        console.warn('API não disponível, utilizando catálogo demonstrativo:', err)
-        setListaEspecialistas(mockEspecialistas)
-      } finally {
+    specialistService
+      .listSpecialists(params)
+      .then((response) => {
+        if (!ativo) return
+        setListaEspecialistas(extrairListaPaginada(response).map(mapearEspecialistaApi))
+        setErro('')
         setCarregando(false)
-      }
-    }
+      })
+      .catch((err) => {
+        if (!ativo) return
+        const parsed = parseApiError(
+          err,
+          'Não foi possível carregar os especialistas no momento.',
+        )
+        setListaEspecialistas([])
+        setErro(parsed.message)
+        setCarregando(false)
+      })
 
-    carregarEspecialistas()
-  }, [busca, area])
+    return () => {
+      ativo = false
+    }
+  }, [busca, area, tentativa])
+
+  function recarregarEspecialistas() {
+    setCarregando(true)
+    setErro('')
+    setTentativa((atual) => atual + 1)
+  }
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLocaleLowerCase('pt-BR')
@@ -84,7 +87,7 @@ export default function EspecialistasPage() {
     return [...filtrados].sort((a, b) => {
       if (ordenacao === 'avaliacao') return b.avaliacao - a.avaliacao
       if (ordenacao === 'menor-preco') return a.valorSessao - b.valorSessao
-      return a.id - b.id
+      return 0
     })
   }, [listaEspecialistas, area, busca, ordenacao])
 
@@ -145,7 +148,9 @@ export default function EspecialistasPage() {
             <p className="mt-2 text-texto-secundario">
               {carregando
                 ? 'Carregando conselheiros...'
-                : `${resultados.length} ${resultados.length === 1 ? 'especialista encontrado' : 'especialistas encontrados'}`}
+                : erro
+                  ? 'Erro ao carregar conselheiros'
+                  : `${resultados.length} ${resultados.length === 1 ? 'especialista encontrado' : 'especialistas encontrados'}`}
             </p>
           </div>
           <button
@@ -182,9 +187,15 @@ export default function EspecialistasPage() {
         </div>
 
         <div className="mt-8" aria-live="polite">
-          {resultados.length > 0 ? (
+          {carregando ? (
+            <EstadoInterface tipo="carregando" />
+          ) : erro ? (
+            <EstadoInterface tipo="erro" descricao={erro} acao={recarregarEspecialistas} />
+          ) : resultados.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {resultados.map((especialista) => <CartaoEspecialista key={especialista.id} especialista={especialista} />)}
+              {resultados.map((especialista) => (
+                <CartaoEspecialista key={especialista.id} especialista={especialista} />
+              ))}
             </div>
           ) : (
             <EstadoInterface tipo="vazio" />

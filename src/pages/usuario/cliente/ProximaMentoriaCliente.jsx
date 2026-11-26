@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import BadgeStatusMentoria from '../../../components/mentoria/BadgeStatusMentoria'
+import { obterInfoStatusMentoria } from '../../../utils/mentoriaStatus'
 
 export default function ProximaMentoriaCliente({ mentoria }) {
   const [perguntas, setPerguntas] = useState(mentoria?.perguntasAnotadas || [])
@@ -44,6 +46,9 @@ export default function ProximaMentoriaCliente({ mentoria }) {
     )
   }
 
+  const infoStatus = obterInfoStatusMentoria(mentoria.status)
+  const podeExibirLink = Boolean(mentoria.linkChamada) && !infoStatus.encerrada
+
   return (
     <div className="overflow-hidden rounded-3xl border-2 border-verde-petroleo/20 bg-white shadow-md">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-divisoria bg-dourado-aviso/60 px-5 py-4 sm:px-6">
@@ -53,9 +58,14 @@ export default function ProximaMentoriaCliente({ mentoria }) {
             Sua Próxima Mentoria
           </span>
         </div>
-        <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-1 text-sm font-semibold text-dourado-escuro">
-          <Clock size={16} aria-hidden="true" />
-          <span>{mentoria.emBreveTexto}</span>
+        <div className="flex items-center gap-2">
+          {mentoria.status && <BadgeStatusMentoria status={mentoria.status} />}
+          {mentoria.emBreveTexto && (
+            <div className="flex items-center gap-2 rounded-full bg-white px-3.5 py-1 text-sm font-semibold text-dourado-escuro">
+              <Clock size={16} aria-hidden="true" />
+              <span>{mentoria.emBreveTexto}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -92,22 +102,31 @@ export default function ProximaMentoriaCliente({ mentoria }) {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a
-              href={mentoria.linkChamada}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-verde-petroleo px-7 text-base font-bold text-white shadow-sm transition-colors hover:bg-verde-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado-foco"
-            >
-              <Video size={20} aria-hidden="true" />
-              Entrar na sala de mentoria
-            </a>
+            {podeExibirLink ? (
+              <a
+                href={mentoria.linkChamada}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-verde-petroleo px-7 text-base font-bold text-white shadow-sm transition-colors hover:bg-verde-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado-foco"
+              >
+                <Video size={20} aria-hidden="true" />
+                Entrar na sala de mentoria
+              </a>
+            ) : !infoStatus.encerrada ? (
+              <p className="inline-flex min-h-14 items-center gap-2 rounded-full border border-divisoria bg-campo px-5 text-sm font-semibold text-texto-secundario">
+                <Video size={18} aria-hidden="true" />
+                O conselheiro ainda não informou o link
+              </p>
+            ) : null}
 
-            <Link
-              to={`/especialistas/${mentoria.especialistaId}`}
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border-2 border-verde-petroleo bg-white px-5 text-base font-bold text-verde-petroleo transition-colors hover:bg-campo"
-            >
-              Ver perfil completo
-            </Link>
+            {mentoria.especialistaId && (
+              <Link
+                to={`/especialistas/${mentoria.especialistaId}`}
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border-2 border-verde-petroleo bg-white px-5 text-base font-bold text-verde-petroleo transition-colors hover:bg-campo"
+              >
+                Ver perfil completo
+              </Link>
+            )}
           </div>
         </div>
 

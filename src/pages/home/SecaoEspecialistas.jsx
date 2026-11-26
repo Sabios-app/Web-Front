@@ -1,10 +1,55 @@
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import CartaoEspecialista from "../../components/CartaoEspecialista";
-import Revelar from "../../components/Revelar";
-import { especialistasEmDestaque } from "./dadosHome";
+import { ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import CartaoEspecialista from '../../components/CartaoEspecialista'
+import EstadoInterface from '../../components/EstadoInterface'
+import Revelar from '../../components/Revelar'
+import { specialistService } from '../../services/sabiosServices'
+import { parseApiError } from '../../utils/apiError'
+import {
+  extrairListaPaginada,
+  mapearEspecialistaApi,
+} from '../../utils/especialistaMapper'
 
 export default function SecaoEspecialistas() {
+  const [especialistas, setEspecialistas] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  const [tentativa, setTentativa] = useState(0)
+
+  useEffect(() => {
+    let ativo = true
+
+    specialistService
+      .listSpecialists({ page: 0, size: 3 })
+      .then((response) => {
+        if (!ativo) return
+        setEspecialistas(extrairListaPaginada(response).map(mapearEspecialistaApi))
+        setErro('')
+        setCarregando(false)
+      })
+      .catch((err) => {
+        if (!ativo) return
+        const parsed = parseApiError(
+          err,
+          'Não foi possível carregar os especialistas em destaque.',
+        )
+        setEspecialistas([])
+        setErro(parsed.message)
+        setCarregando(false)
+      })
+
+    return () => {
+      ativo = false
+    }
+  }, [tentativa])
+
+  function recarregarDestaques() {
+    setCarregando(true)
+    setErro('')
+    setTentativa((atual) => atual + 1)
+  }
+
   return (
     <section id="especialistas" className="bg-campo/70">
       <div className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8 lg:py-24">
@@ -30,14 +75,28 @@ export default function SecaoEspecialistas() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {especialistasEmDestaque.map((especialista, indice) => (
-            <Revelar key={especialista.id} atraso={indice * 150}>
-              <CartaoEspecialista especialista={especialista} />
-            </Revelar>
-          ))}
+        <div className="mt-10">
+          {carregando ? (
+            <EstadoInterface tipo="carregando" />
+          ) : erro ? (
+            <EstadoInterface tipo="erro" descricao={erro} acao={recarregarDestaques} />
+          ) : especialistas.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-3">
+              {especialistas.map((especialista, indice) => (
+                <Revelar key={especialista.id} atraso={indice * 150}>
+                  <CartaoEspecialista especialista={especialista} />
+                </Revelar>
+              ))}
+            </div>
+          ) : (
+            <EstadoInterface
+              tipo="vazio"
+              titulo="Nenhum especialista em destaque no momento"
+              descricao="Confira a lista completa de conselheiros disponíveis na plataforma."
+            />
+          )}
         </div>
       </div>
     </section>
-  );
+  )
 }

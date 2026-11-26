@@ -1,14 +1,23 @@
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { dadosCliente, dadosConselheiro } from '../data/dadosUsuario'
+import useAuth from '../hooks/useAuth'
 import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
+import { actionPlanService, mentoringService } from '../services/sabiosServices'
+import {
+  AVATAR_PADRAO,
+  extrairListaPaginada,
+  mapearMentoriaApi,
+} from '../utils/especialistaMapper'
+import { formatarDataBR } from '../utils/formatadores'
 import AgendaCliente from './usuario/cliente/AgendaCliente'
 import MensagensCliente from './usuario/cliente/MensagensCliente'
+import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
+import ConfiguracoesUsuario from './usuario/compartilhado/ConfiguracoesUsuario'
 import AgendaConselheiro from './usuario/conselheiro/AgendaConselheiro'
 import AvaliacoesConselheiro from './usuario/conselheiro/AvaliacoesConselheiro'
 import MensagensConselheiro from './usuario/conselheiro/MensagensConselheiro'
 import SolicitacoesPendentesConselheiro from './usuario/conselheiro/SolicitacoesPendentesConselheiro'
-import ConfiguracoesUsuario from './usuario/compartilhado/ConfiguracoesUsuario'
-import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
 
 const titulos = {
   cliente: {
@@ -26,10 +35,10 @@ const titulos = {
   },
 }
 
-function ConteudoCliente({ secao, usuario }) {
+function ConteudoCliente({ secao, usuario, planoVersao }) {
   const secoes = {
     agenda: <AgendaCliente usuario={usuario} />,
-    plano: <PlanoDeAcaoCliente acoesIniciais={usuario.planoDeAcao} />,
+    plano: <PlanoDeAcaoCliente key={planoVersao} acoesIniciais={usuario.planoDeAcao} />,
     mensagens: <MensagensCliente />,
     perfil: <ConfiguracoesUsuario perfil="cliente" usuario={usuario} />,
   }
@@ -53,11 +62,79 @@ function ConteudoConselheiro({ secao, usuario }) {
 
 export default function AreaUsuarioSecaoPage({ perfil }) {
   const { secao } = useParams()
-  const usuario = perfil === 'cliente' ? dadosCliente : dadosConselheiro
+  const { user } = useAuth()
+  const [proximaMentoria, setProximaMentoria] = useState(null)
+  const [historicoMentorias, setHistoricoMentorias] = useState([])
+  const [planoDeAcao, setPlanoDeAcao] = useState([])
+  const [planoVersao, setPlanoVersao] = useState(0)
+
+  useEffect(() => {
+    if (perfil !== 'cliente') return undefined
+    let ativo = true
+
+    async function carregarSecaoCliente() {
+      const [nextRes, listRes, planosRes] = await Promise.allSettled([
+        mentoringService.getNextMentoring(),
+        mentoringService.listMyMentorings(),
+        actionPlanService.list(),
+      ])
+
+      if (!ativo) return
+
+      if (nextRes.status === 'fulfilled' && nextRes.value && nextRes.value.id) {
+        setProximaMentoria(mapearMentoriaApi(nextRes.value))
+      } else {
+        setProximaMentoria(null)
+      }
+
+      if (listRes.status === 'fulfilled') {
+        setHistoricoMentorias(
+          extrairListaPaginada(listRes.value).map(mapearMentoriaApi),
+        )
+      }
+
+      if (planosRes.status === 'fulfilled') {
+        const planos = extrairListaPaginada(planosRes.value)
+        setPlanoDeAcao(
+          planos.map((p) => ({
+            id: p.id,
+            titulo: p.title,
+            prazo: p.deadline ? formatarDataBR(p.deadline) : 'Em andamento',
+            concluido: Boolean(p.completed),
+            conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
+          })),
+        )
+        setPlanoVersao((v) => v + 1)
+      }
+    }
+
+    carregarSecaoCliente()
+    return () => {
+      ativo = false
+    }
+  }, [perfil])
+
+  const usuarioBase = perfil === 'cliente' ? dadosCliente : dadosConselheiro
+  const usuario =
+    perfil === 'cliente'
+      ? {
+          ...usuarioBase,
+          nome: user?.name || usuarioBase.nome,
+          foto: user?.avatarUrl || AVATAR_PADRAO,
+          proximaMentoria,
+          historicoMentorias,
+          planoDeAcao,
+        }
+      : {
+          ...usuarioBase,
+          nome: user?.name || usuarioBase.nome,
+          foto: user?.avatarUrl || usuarioBase.foto,
+        }
+
   const titulo = titulos[perfil]?.[secao] ?? 'Área do usuário'
   const conteudo =
     perfil === 'cliente' ? (
-      <ConteudoCliente secao={secao} usuario={usuario} />
+      <ConteudoCliente secao={secao} usuario={usuario} planoVersao={planoVersao} />
     ) : (
       <ConteudoConselheiro secao={secao} usuario={usuario} />
     )

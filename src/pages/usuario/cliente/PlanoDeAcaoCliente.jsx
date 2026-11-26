@@ -1,29 +1,29 @@
 import { CheckSquare, ChevronDown, Plus, Square } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import AlertaFormulario from '../../../components/feedback/AlertaFormulario'
 import { actionPlanService } from '../../../services/sabiosServices'
+import { extrairErrosDeCampo, parseApiError } from '../../../utils/apiError'
 
 export default function PlanoDeAcaoCliente({ acoesIniciais }) {
-  const [acoes, setAcoes] = useState(acoesIniciais || [])
+  const [acoes, setAcoes] = useState(() => acoesIniciais || [])
   const [novaAcao, setNovaAcao] = useState('')
-
-  useEffect(() => {
-    if (acoesIniciais && acoesIniciais.length > 0) {
-      setAcoes(acoesIniciais)
-    }
-  }, [acoesIniciais])
+  const [erro, setErro] = useState('')
+  const [erroCampo, setErroCampo] = useState('')
 
   async function alternarAcao(id) {
-    // Atualização otimista
-    setAcoes(
-      acoes.map((a) => (a.id === id ? { ...a, concluido: !a.concluido } : a))
+    setErro('')
+    const anteriores = acoes
+    setAcoes((atuais) =>
+      atuais.map((a) => (a.id === id ? { ...a, concluido: !a.concluido } : a)),
     )
 
-    // Se for um ID numérico da API, dispara chamada ao backend
-    if (typeof id === 'number' || !isNaN(Number(id))) {
+    if (typeof id === 'number' || (typeof id === 'string' && !id.startsWith('acao-'))) {
       try {
         await actionPlanService.toggle(id)
       } catch (err) {
-        console.warn('Erro ao atualizar plano no backend:', err)
+        const parsed = parseApiError(err, 'Não foi possível atualizar a tarefa.')
+        setErro(parsed.message)
+        setAcoes(anteriores)
       }
     }
   }
@@ -31,6 +31,9 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
   async function adicionarAcao(e) {
     e.preventDefault()
     if (!novaAcao.trim()) return
+
+    setErro('')
+    setErroCampo('')
 
     const texto = novaAcao.trim()
     const novoLocal = {
@@ -40,7 +43,7 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
       concluido: false,
       conselheiro: 'Minha anotação',
     }
-    setAcoes([...acoes, novoLocal])
+    setAcoes((atuais) => [...atuais, novoLocal])
     setNovaAcao('')
 
     try {
@@ -51,11 +54,19 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
       })
       if (criado && criado.id) {
         setAcoes((prev) =>
-          prev.map((a) => (a.id === novoLocal.id ? { ...a, id: criado.id } : a))
+          prev.map((a) => (a.id === novoLocal.id ? { ...a, id: criado.id } : a)),
         )
       }
     } catch (err) {
-      console.warn('Erro ao persistir plano de ação no backend:', err)
+      const parsed = parseApiError(err, 'Não foi possível salvar a nova meta no servidor.')
+      const { errosCampos, mensagemGeral } = extrairErrosDeCampo(
+        parsed,
+        { title: 'titulo' },
+        ['titulo'],
+      )
+      setErroCampo(errosCampos.titulo || '')
+      setErro(mensagemGeral)
+      setAcoes((prev) => prev.filter((a) => a.id !== novoLocal.id))
     }
   }
 
@@ -103,6 +114,8 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
             />
           </div>
 
+          <AlertaFormulario tipo="erro">{erro}</AlertaFormulario>
+
           <div className="mt-5 space-y-3">
             {acoes.map((a) => (
               <div
@@ -145,13 +158,28 @@ export default function PlanoDeAcaoCliente({ acoesIniciais }) {
           </div>
 
           <form onSubmit={adicionarAcao} className="mt-6 flex flex-col gap-2 border-t border-divisoria pt-6 sm:flex-row">
-            <input
-              type="text"
-              value={novaAcao}
-              onChange={(e) => setNovaAcao(e.target.value)}
-              placeholder="Adicionar nova meta ou tarefa para seu negócio..."
-              className="h-12 flex-1 rounded-xl border border-divisoria bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 focus:ring-dourado-foco"
-            />
+            <div className="flex-1">
+              <input
+                type="text"
+                value={novaAcao}
+                onChange={(e) => {
+                  setNovaAcao(e.target.value)
+                  if (erroCampo) setErroCampo('')
+                }}
+                placeholder="Adicionar nova meta ou tarefa para seu negócio..."
+                aria-invalid={Boolean(erroCampo)}
+                className={`h-12 w-full rounded-xl border bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 ${
+                  erroCampo
+                    ? 'border-red-500 focus:ring-red-200'
+                    : 'border-divisoria focus:ring-dourado-foco'
+                }`}
+              />
+              {erroCampo && (
+                <p role="alert" className="mt-1 text-xs font-semibold text-red-700">
+                  {erroCampo}
+                </p>
+              )}
+            </div>
             <button
               type="submit"
               className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-5 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"

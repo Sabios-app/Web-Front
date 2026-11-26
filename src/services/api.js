@@ -1,6 +1,9 @@
 import axios from 'axios'
+import { CHAVES_AUTH } from '../utils/authStorage.js'
+import { criarTratadorErroResposta } from './apiInterceptor.js'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+const API_BASE_URL =
+  import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,24 +14,18 @@ const api = axios.create({
 
 // Interceptador para injetar automaticamente o Token JWT
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('sabios:token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  try {
+    const token = globalThis.localStorage?.getItem(CHAVES_AUTH.token)
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+  } catch {
+    // Ignora caso localStorage esteja indisponível
   }
   return config
 })
 
-// Interceptador de resposta para tratar sessão expirada
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('sabios:token')
-      localStorage.removeItem('sabios:user')
-      localStorage.removeItem('sabios:perfil')
-    }
-    return Promise.reject(error)
-  }
-)
+// Interceptador de resposta para tratar sessão expirada (401 fora do login)
+api.interceptors.response.use((response) => response, criarTratadorErroResposta())
 
 export default api

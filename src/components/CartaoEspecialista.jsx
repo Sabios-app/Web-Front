@@ -1,6 +1,6 @@
 import { ArrowRight, Star } from 'lucide-react'
 import BotaoLink from './BotaoLink'
-import { formatarNota, formatarReais } from '../data/especialistas'
+import { formatarNota, formatarReais } from '../utils/formatadores'
 
 export default function CartaoEspecialista({ especialista }) {
   return (
@@ -30,7 +30,7 @@ export default function CartaoEspecialista({ especialista }) {
         <p className="mt-3 text-base leading-relaxed text-texto-secundario">{especialista.descricao}</p>
 
         <ul className="so-completo mt-4 flex flex-wrap gap-2">
-          {especialista.temas.map((tema) => (
+          {(especialista.temas || []).map((tema) => (
             <li key={tema} className="rounded-full bg-campo px-3 py-1 text-sm font-semibold text-verde-titulo">
               {tema}
             </li>

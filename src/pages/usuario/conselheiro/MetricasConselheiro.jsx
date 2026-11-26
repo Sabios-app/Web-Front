@@ -1,5 +1,5 @@
 import { CalendarCheck, DollarSign, Star, Users } from 'lucide-react'
-import { formatarNota, formatarReais } from '../../../data/especialistas'
+import { formatarNota, formatarReais } from '../../../utils/formatadores'
 
 export default function MetricasConselheiro({ metricas }) {
   const cards = [
