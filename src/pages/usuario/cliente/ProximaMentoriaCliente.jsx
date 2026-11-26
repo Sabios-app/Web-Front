@@ -1,9 +1,17 @@
-import { CalendarDays, Clock, HelpCircle, Plus, Trash2, Video } from 'lucide-react'
+import {
+  CalendarDays,
+  ChevronDown,
+  Clock,
+  HelpCircle,
+  Plus,
+  Trash2,
+  Video,
+} from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function ProximaMentoriaCliente({ mentoria }) {
-  const [perguntas, setPerguntas] = useState(mentoria.perguntasAnotadas || [])
+  const [perguntas, setPerguntas] = useState(mentoria?.perguntasAnotadas || [])
   const [novaPergunta, setNovaPergunta] = useState('')
 
   function adicionarPergunta(e) {
@@ -113,50 +121,57 @@ export default function ProximaMentoriaCliente({ mentoria }) {
         </div>
 
         {/* Bloco de perguntas para não esquecer na hora da reunião */}
-        <div className="mt-6 border-t border-divisoria pt-6">
-          <div className="flex items-center gap-2">
-            <HelpCircle size={18} className="text-dourado-escuro" />
-            <h3 className="font-titulo text-lg font-bold text-verde-titulo">
-              Suas perguntas anotadas para fazer nesta sessão:
-            </h3>
-          </div>
-
-          <ul className="mt-3 space-y-2">
-            {perguntas.map((p, idx) => (
-              <li
-                key={idx}
-                className="flex items-center justify-between rounded-xl border border-divisoria bg-white px-4 py-2.5 text-sm font-medium text-verde-petroleo"
-              >
-                <span>• {p}</span>
-                <button
-                  type="button"
-                  onClick={() => removerPergunta(idx)}
-                  className="text-texto-secundario hover:text-red-600"
-                  title="Remover pergunta"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          <form onSubmit={adicionarPergunta} className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <input
-              type="text"
-              value={novaPergunta}
-              onChange={(e) => setNovaPergunta(e.target.value)}
-              placeholder="Digite mais uma dúvida que gostaria de perguntar..."
-              className="h-11 flex-1 rounded-xl border border-divisoria bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 focus:ring-dourado-foco"
+        <details className="group mt-6 border-t border-divisoria pt-6">
+          <summary className="flex cursor-pointer list-none items-center gap-2 rounded-xl text-verde-titulo focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-dourado-foco">
+            <HelpCircle size={18} className="shrink-0 text-dourado-escuro" aria-hidden="true" />
+            <span className="flex-1 font-titulo text-lg font-bold">
+              Perguntas para esta sessão ({perguntas.length})
+            </span>
+            <ChevronDown
+              size={20}
+              aria-hidden="true"
+              className="shrink-0 transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none"
             />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-4 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
-            >
-              <Plus size={16} />
-              Anotar
-            </button>
-          </form>
-        </div>
+          </summary>
+
+          <div className="mt-4">
+            <ul className="space-y-2">
+              {perguntas.map((p, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-center justify-between rounded-xl border border-divisoria bg-white px-4 py-2.5 text-sm font-medium text-verde-petroleo"
+                >
+                  <span>• {p}</span>
+                  <button
+                    type="button"
+                    onClick={() => removerPergunta(idx)}
+                    className="text-texto-secundario hover:text-red-600"
+                    title="Remover pergunta"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <form onSubmit={adicionarPergunta} className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <input
+                type="text"
+                value={novaPergunta}
+                onChange={(e) => setNovaPergunta(e.target.value)}
+                placeholder="Digite mais uma dúvida que gostaria de perguntar..."
+                className="h-11 flex-1 rounded-xl border border-divisoria bg-white px-4 text-sm text-verde-petroleo focus:outline-none focus:ring-2 focus:ring-dourado-foco"
+              />
+              <button
+                type="submit"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-verde-petroleo px-4 text-sm font-bold text-white transition-colors hover:bg-verde-hover sm:shrink-0"
+              >
+                <Plus size={16} aria-hidden="true" />
+                Anotar
+              </button>
+            </form>
+          </div>
+        </details>
       </div>
     </div>
   )

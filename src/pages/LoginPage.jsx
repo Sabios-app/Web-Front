@@ -1,10 +1,11 @@
-import { Briefcase, Star } from 'lucide-react'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Botao from '../components/Botao'
-import CampoTexto from '../components/CampoTexto'
-import useAuth from '../hooks/useAuth'
-import AuthLayout from '../layouts/AuthLayout'
+import { Briefcase, Star } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Botao from "../components/Botao";
+import CampoTexto from "../components/CampoTexto";
+import useAuth from "../hooks/useAuth";
+import AuthLayout from "../layouts/AuthLayout";
+import fotoLogin from "../assets/homeLogin.jpg";
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout imagem={fotoLogin}>
       <div className="w-full max-w-md">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-dourado-escuro">
@@ -64,10 +65,16 @@ export default function LoginPage() {
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label htmlFor="senha" className="block text-base font-bold text-verde-titulo">
+              <label
+                htmlFor="senha"
+                className="block text-base font-bold text-verde-titulo"
+              >
                 Senha
               </label>
-              <Link to="/recuperar-senha" className="text-xs font-semibold text-dourado-escuro hover:underline">
+              <Link
+                to="/recuperar-senha"
+                className="text-xs font-semibold text-dourado-escuro hover:underline"
+              >
                 Esqueceu a senha?
               </Link>
             </div>
@@ -91,13 +98,16 @@ export default function LoginPage() {
 
         <div className="mt-8 border-t border-divisoria pt-6 text-center">
           <p className="text-sm text-texto-secundario">
-            Ainda não tem cadastro?{' '}
-            <Link to="/cadastro" className="font-bold text-dourado-escuro hover:underline">
+            Ainda não tem cadastro?{" "}
+            <Link
+              to="/cadastro"
+              className="font-bold text-dourado-escuro hover:underline"
+            >
               Criar conta gratuita
             </Link>
           </p>
         </div>
       </div>
     </AuthLayout>
-  )
+  );
 }

@@ -5,6 +5,7 @@ import { authService } from '../services/sabiosServices'
 const CHAVE_TOKEN = 'sabios:token'
 const CHAVE_USER = 'sabios:user'
 const CHAVE_PERFIL = 'sabios:perfil'
+const PERFIS_VALIDOS = ['cliente', 'conselheiro']
 
 function lerJSON(chave) {
   try {
