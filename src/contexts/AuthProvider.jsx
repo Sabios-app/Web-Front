@@ -1,100 +1,94 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContext } from './AuthContext'
 import { authService } from '../services/sabiosServices'
-
-const CHAVE_TOKEN = 'sabios:token'
-const CHAVE_USER = 'sabios:user'
-const CHAVE_PERFIL = 'sabios:perfil'
-const PERFIS_VALIDOS = ['cliente', 'conselheiro']
-
-function lerJSON(chave) {
-  try {
-    const item = localStorage.getItem(chave)
-    return item ? JSON.parse(item) : null
-  } catch {
-    return null
-  }
-}
+import {
+  EVENTO_SESSAO_EXPIRADA,
+  lerSessaoAuth,
+  limparSessaoAuth,
+  normalizarPerfil,
+  salvarSessaoAuth,
+} from '../utils/authStorage'
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => lerJSON(CHAVE_USER))
-  const [token, setToken] = useState(() => localStorage.getItem(CHAVE_TOKEN) || null)
-  const [perfil, setPerfil] = useState(() => localStorage.getItem(CHAVE_PERFIL) || null)
-  const [carregando, setCarregando] = useState(true)
+  const [sessaoInicial] = useState(() => lerSessaoAuth())
+  const [user, setUser] = useState(sessaoInicial.user)
+  const [token, setToken] = useState(sessaoInicial.token)
+  const [perfil, setPerfil] = useState(sessaoInicial.perfil)
+  const [carregando, setCarregando] = useState(() => Boolean(sessaoInicial.token))
 
-  // Ao iniciar, se tiver token, valida e sincroniza dados com o backend
+  const sair = useCallback(() => {
+    setToken(null)
+    setUser(null)
+    setPerfil(null)
+    limparSessaoAuth()
+  }, [])
+
+  const aplicarSessao = useCallback((tokenRecebido, usuarioRecebido) => {
+    const perfilNormalizado = normalizarPerfil(usuarioRecebido?.role)
+    setToken(tokenRecebido)
+    setUser(usuarioRecebido)
+    setPerfil(perfilNormalizado)
+    salvarSessaoAuth({
+      token: tokenRecebido,
+      user: usuarioRecebido,
+      perfil: perfilNormalizado,
+    })
+    return perfilNormalizado
+  }, [])
+
+  // Ao iniciar com token salvo, valida e sincroniza os dados com o backend
   useEffect(() => {
-    async function sincronizarUsuario() {
-      if (!token) {
-        setCarregando(false)
-        return
-      }
+    if (!sessaoInicial.token) return undefined
 
+    let ativo = true
+
+    async function sincronizarUsuario() {
       try {
         const dados = await authService.getMe()
-        const perfilNormalizado = dados.role === 'COUNSELOR' ? 'conselheiro' : 'cliente'
+        if (!ativo) return
+        const perfilNormalizado = normalizarPerfil(dados?.role)
         setUser(dados)
         setPerfil(perfilNormalizado)
-        localStorage.setItem(CHAVE_USER, JSON.stringify(dados))
-        localStorage.setItem(CHAVE_PERFIL, perfilNormalizado)
-      } catch (err) {
-        sair()
+        salvarSessaoAuth({ user: dados, perfil: perfilNormalizado })
+      } catch {
+        if (ativo) sair()
       } finally {
-        setCarregando(false)
+        if (ativo) setCarregando(false)
       }
     }
 
     sincronizarUsuario()
-  }, [token])
+    return () => {
+      ativo = false
+    }
+  }, [sessaoInicial.token, sair])
 
-  async function login(email, password) {
+  // Sincroniza estado se o interceptor HTTP detectar 401 (sessão expirada)
+  useEffect(() => {
+    function aoExpirarSessao() {
+      sair()
+    }
+
+    window.addEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirarSessao)
+    return () => {
+      window.removeEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirarSessao)
+    }
+  }, [sair])
+
+  const login = useCallback(async (email, password) => {
     const authData = await authService.login(email, password)
-    const tokenRecebido = authData.token
-    const usuarioRecebido = authData.user
-    const perfilNormalizado = usuarioRecebido.role === 'COUNSELOR' ? 'conselheiro' : 'cliente'
+    return aplicarSessao(authData.token, authData.user)
+  }, [aplicarSessao])
 
-    setToken(tokenRecebido)
-    setUser(usuarioRecebido)
-    setPerfil(perfilNormalizado)
-
-    localStorage.setItem(CHAVE_TOKEN, tokenRecebido)
-    localStorage.setItem(CHAVE_USER, JSON.stringify(usuarioRecebido))
-    localStorage.setItem(CHAVE_PERFIL, perfilNormalizado)
-
-    return perfilNormalizado
-  }
-
-  async function cadastrar({ name, email, password, role, phone }) {
+  const cadastrar = useCallback(async ({ name, email, password, role, phone }) => {
     const authData = await authService.register({ name, email, password, role, phone })
-    const tokenRecebido = authData.token
-    const usuarioRecebido = authData.user
-    const perfilNormalizado = usuarioRecebido.role === 'COUNSELOR' ? 'conselheiro' : 'cliente'
+    return aplicarSessao(authData.token, authData.user)
+  }, [aplicarSessao])
 
-    setToken(tokenRecebido)
-    setUser(usuarioRecebido)
-    setPerfil(perfilNormalizado)
-
-    localStorage.setItem(CHAVE_TOKEN, tokenRecebido)
-    localStorage.setItem(CHAVE_USER, JSON.stringify(usuarioRecebido))
-    localStorage.setItem(CHAVE_PERFIL, perfilNormalizado)
-
-    return perfilNormalizado
-  }
-
-  function entrar(novoPerfil) {
-    // Compatibilidade temporária para testes rápidos
+  const entrar = useCallback((novoPerfil) => {
     setPerfil(novoPerfil)
-    localStorage.setItem(CHAVE_PERFIL, novoPerfil)
-  }
-
-  function sair() {
-    setToken(null)
-    setUser(null)
-    setPerfil(null)
-    localStorage.removeItem(CHAVE_TOKEN)
-    localStorage.removeItem(CHAVE_USER)
-    localStorage.removeItem(CHAVE_PERFIL)
-  }
+    salvarSessaoAuth({ perfil: novoPerfil })
+  }, [])
 
   const valor = useMemo(() => ({
     user,
@@ -105,7 +99,7 @@ export default function AuthProvider({ children }) {
     cadastrar,
     entrar,
     sair,
-  }), [user, token, perfil, carregando])
+  }), [user, token, perfil, carregando, login, cadastrar, entrar, sair])
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>
 }

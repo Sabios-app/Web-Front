@@ -124,7 +124,4 @@ export function buscarEspecialistaPorId(id) {
   return especialistas.find((especialista) => especialista.id === Number(id))
 }
 
-export const formatarReais = (valor) =>
-  valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
-
-export const formatarNota = (nota) => nota.toFixed(1).replace('.', ',')
+export { formatarNota, formatarReais } from '../utils/formatadores'

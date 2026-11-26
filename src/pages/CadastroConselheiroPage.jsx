@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
-import AuthLayout from '../layouts/AuthLayout'
 import Botao from '../components/Botao'
 import CabecalhoEtapa from '../components/CabecalhoEtapa'
 import CampoTexto from '../components/CampoTexto'
+import AlertaFormulario from '../components/feedback/AlertaFormulario'
+import SelecaoOpcoes from '../components/forms/SelecaoOpcoes'
 import useAuth from '../hooks/useAuth'
+import AuthLayout from '../layouts/AuthLayout'
 import { specialistService } from '../services/sabiosServices'
+import { extrairErrosDeCampo, parseApiError } from '../utils/apiError'
 
 const AREAS_DISPONIVEIS = [
   'Finanças & Gestão',
@@ -16,16 +18,28 @@ const AREAS_DISPONIVEIS = [
   'Marketing & Clientes',
 ]
 
+const ALIASES_CADASTRO_CONSELHEIRO = {
+  name: 'nome',
+  password: 'senha',
+  phone: 'telefone',
+  bio: 'sobre',
+  specialty: 'areas',
+  hourlyRate: 'valorSessao',
+}
+
+const CAMPOS_ETAPA_1 = ['nome', 'email', 'senha', 'telefone']
+const CAMPOS_CONSELHEIRO = [...CAMPOS_ETAPA_1, 'sobre', 'areas', 'valorSessao']
+
 export default function CadastroConselheiroPage() {
   const navigate = useNavigate()
   const { cadastrar } = useAuth()
 
-  // em qual etapa a pessoa está (1 ou 2)
   const [etapa, setEtapa] = useState(1)
+  const [contaCriada, setContaCriada] = useState(false)
   const [erro, setErro] = useState('')
+  const [errosCampos, setErrosCampos] = useState({})
   const [carregando, setCarregando] = useState(false)
 
-  // tudo o que a pessoa digitou
   const [dados, setDados] = useState({
     nome: '',
     email: '',
@@ -39,9 +53,11 @@ export default function CadastroConselheiroPage() {
     valorSessao: '180',
   })
 
-  // atualiza só o campo que mudou e mantém o resto
   function atualizar(campo, valor) {
-    setDados({ ...dados, [campo]: valor })
+    setDados((atual) => ({ ...atual, [campo]: valor }))
+    if (errosCampos[campo]) {
+      setErrosCampos((atual) => ({ ...atual, [campo]: '' }))
+    }
   }
 
   function alternarArea(area) {
@@ -60,13 +76,18 @@ export default function CadastroConselheiroPage() {
   }
 
   async function continuar(e) {
-    e.preventDefault() // impede a página de recarregar
+    e.preventDefault()
     if (etapa === 1) {
-      setEtapa(2)
-    } else {
       setErro('')
-      setCarregando(true)
-      try {
+      setEtapa(2)
+      return
+    }
+
+    setErro('')
+    setErrosCampos({})
+    setCarregando(true)
+    try {
+      if (!contaCriada) {
         await cadastrar({
           name: dados.nome,
           email: dados.email,
@@ -74,26 +95,31 @@ export default function CadastroConselheiroPage() {
           role: 'COUNSELOR',
           phone: dados.telefone,
         })
-
-        // Tenta registrar o perfil de especialista do conselheiro no backend
-        try {
-          const valorNumerico = parseFloat(dados.valorSessao.replace(',', '.')) || 150.0
-          await specialistService.createProfile({
-            bio: dados.sobre,
-            specialty: dados.areas.join(', '),
-            hourlyRate: valorNumerico,
-          })
-        } catch (perfilErr) {
-          console.warn('Perfil especialista será configurado no onboarding:', perfilErr)
-        }
-
-        navigate('/usuario/conselheiro')
-      } catch (err) {
-        const msg = err.response?.data?.message || 'Erro ao realizar cadastro de conselheiro.'
-        setErro(msg)
-      } finally {
-        setCarregando(false)
+        setContaCriada(true)
       }
+
+      const valorNumerico = parseFloat(dados.valorSessao.replace(',', '.')) || 150.0
+      await specialistService.createProfile({
+        bio: dados.sobre,
+        specialty: dados.areas.join(', '),
+        hourlyRate: valorNumerico,
+      })
+
+      navigate('/usuario/conselheiro')
+    } catch (err) {
+      const parsed = parseApiError(err, 'Erro ao realizar cadastro de conselheiro.')
+      const { errosCampos: campos, mensagemGeral } = extrairErrosDeCampo(
+        parsed,
+        ALIASES_CADASTRO_CONSELHEIRO,
+        CAMPOS_CONSELHEIRO,
+      )
+      setErrosCampos(campos)
+      setErro(mensagemGeral)
+      if (CAMPOS_ETAPA_1.some((campo) => campos[campo])) {
+        setEtapa(1)
+      }
+    } finally {
+      setCarregando(false)
     }
   }
 
@@ -112,11 +138,7 @@ export default function CadastroConselheiroPage() {
           aoVoltar={voltar}
         />
 
-        {erro && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
-            {erro}
-          </div>
-        )}
+        <AlertaFormulario tipo="erro">{erro}</AlertaFormulario>
 
         {etapa === 1 && (
           <div className="mt-8 flex flex-col gap-5">
@@ -126,36 +148,36 @@ export default function CadastroConselheiroPage() {
               placeholder="Digite seu nome completo"
               valor={dados.nome}
               aoMudar={(e) => atualizar('nome', e.target.value)}
+              erro={errosCampos.nome}
               obrigatorio
             />
             <CampoTexto
               id="email"
+              type="email"
               rotulo="E-mail de acesso"
               placeholder="seuemail@exemplo.com"
               valor={dados.email}
               aoMudar={(e) => atualizar('email', e.target.value)}
+              erro={errosCampos.email}
               obrigatorio
             />
-            <div>
-              <label htmlFor="senha" className="mb-2 block text-base font-bold text-verde-titulo">
-                Senha de acesso
-              </label>
-              <input
-                id="senha"
-                type="password"
-                required
-                value={dados.senha}
-                onChange={(e) => atualizar('senha', e.target.value)}
-                placeholder="Mínimo 6 caracteres"
-                className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
-              />
-            </div>
+            <CampoTexto
+              id="senha"
+              type="password"
+              rotulo="Senha de acesso"
+              placeholder="Mínimo 6 caracteres"
+              valor={dados.senha}
+              aoMudar={(e) => atualizar('senha', e.target.value)}
+              erro={errosCampos.senha}
+              obrigatorio
+            />
             <CampoTexto
               id="telefone"
               rotulo="Telefone / WhatsApp"
               placeholder="(11) 99999-9999"
               valor={dados.telefone}
               aoMudar={(e) => atualizar('telefone', e.target.value)}
+              erro={errosCampos.telefone}
             />
             <CampoTexto
               id="cargo"
@@ -188,6 +210,11 @@ export default function CadastroConselheiroPage() {
                 selecionadas={dados.areas}
                 aoAlternar={alternarArea}
               />
+              {errosCampos.areas && (
+                <p role="alert" className="mt-1.5 text-sm font-semibold text-red-700">
+                  {errosCampos.areas}
+                </p>
+              )}
             </div>
 
             <CampoTexto
@@ -209,9 +236,20 @@ export default function CadastroConselheiroPage() {
                 value={dados.sobre}
                 onChange={(e) => atualizar('sobre', e.target.value)}
                 placeholder="Ex.: Fui diretora financeira por 32 anos. Hoje ajudo pequenos negócios a organizar o fluxo de caixa..."
-                className="w-full rounded-xl border border-divisoria bg-white p-4 text-base text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
+                aria-invalid={Boolean(errosCampos.sobre)}
+                aria-describedby={errosCampos.sobre ? 'sobre-erro' : undefined}
+                className={`w-full rounded-xl border bg-white p-4 text-base text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:outline-none! focus:ring-2 focus:ring-offset-0 ${
+                  errosCampos.sobre
+                    ? 'border-red-500 focus:border-red-600 focus:ring-red-200'
+                    : 'border-divisoria focus:border-dourado-foco focus:ring-dourado-foco/15'
+                }`}
                 required
               />
+              {errosCampos.sobre && (
+                <p id="sobre-erro" role="alert" className="mt-1.5 text-sm font-semibold text-red-700">
+                  {errosCampos.sobre}
+                </p>
+              )}
             </div>
 
             <CampoTexto
@@ -220,6 +258,7 @@ export default function CadastroConselheiroPage() {
               placeholder="Ex.: 180"
               valor={dados.valorSessao}
               aoMudar={(e) => atualizar('valorSessao', e.target.value)}
+              erro={errosCampos.valorSessao}
               obrigatorio
             />
 

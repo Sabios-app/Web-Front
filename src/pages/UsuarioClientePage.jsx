@@ -1,76 +1,93 @@
 import { Compass, History } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import BlocoDicas from '../components/feedback/BlocoDicas'
 import NavegacaoAbas from '../components/navigation/NavegacaoAbas'
 import { dadosCliente } from '../data/dadosUsuario'
+import useAuth from '../hooks/useAuth'
 import AreaUsuarioLayout from '../layouts/AreaUsuarioLayout'
+import {
+  actionPlanService,
+  mentoringService,
+  specialistService,
+} from '../services/sabiosServices'
+import {
+  AVATAR_PADRAO,
+  extrairListaPaginada,
+  mapearEspecialistaApi,
+  mapearMentoriaApi,
+} from '../utils/especialistaMapper'
+import { formatarDataBR } from '../utils/formatadores'
 import CabecalhoCliente from './usuario/cliente/CabecalhoCliente'
 import ConselheirosRecomendadosCliente from './usuario/cliente/ConselheirosRecomendadosCliente'
 import HistoricoMentoriasCliente from './usuario/cliente/HistoricoMentoriasCliente'
 import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
 import ProximaMentoriaCliente from './usuario/cliente/ProximaMentoriaCliente'
-import useAuth from '../hooks/useAuth'
-import { mentoringService, actionPlanService } from '../services/sabiosServices'
 
 export default function UsuarioClientePage() {
   const { user } = useAuth()
-  const [cliente, setCliente] = useState(dadosCliente)
-  const [proximaMentoria, setProximaMentoria] = useState(dadosCliente.proximaMentoria)
-  const [planoDeAcao, setPlanoDeAcao] = useState(dadosCliente.planoDeAcao)
+  const [proximaMentoria, setProximaMentoria] = useState(null)
+  const [historicoMentorias, setHistoricoMentorias] = useState([])
+  const [conselheirosRecomendados, setConselheirosRecomendados] = useState([])
+  const [planoDeAcao, setPlanoDeAcao] = useState([])
+  const [planoVersao, setPlanoVersao] = useState(0)
   const [abaAtiva, setAbaAtiva] = useState('plano')
 
+  const cliente = {
+    ...dadosCliente,
+    nome: user?.name || dadosCliente.nome,
+    foto: user?.avatarUrl || AVATAR_PADRAO,
+    historicoMentorias,
+    conselheirosRecomendados,
+  }
+
   useEffect(() => {
+    let ativo = true
+
     async function carregarDadosDashboard() {
-      // 1. Atualizar nome do usuário logado se disponível
-      if (user?.name) {
-        setCliente((prev) => ({
-          ...prev,
-          nome: user.name,
-          email: user.email || prev.email,
+      const [nextRes, listRes, planosRes, espRes] = await Promise.allSettled([
+        mentoringService.getNextMentoring(),
+        mentoringService.listMyMentorings(),
+        actionPlanService.list(),
+        specialistService.listSpecialists({ page: 0, size: 3 }),
+      ])
+
+      if (!ativo) return
+
+      if (nextRes.status === 'fulfilled' && nextRes.value && nextRes.value.id) {
+        setProximaMentoria(mapearMentoriaApi(nextRes.value))
+      } else {
+        setProximaMentoria(null)
+      }
+
+      if (listRes.status === 'fulfilled') {
+        const mentorias = extrairListaPaginada(listRes.value).map(mapearMentoriaApi)
+        setHistoricoMentorias(mentorias)
+      }
+
+      if (planosRes.status === 'fulfilled') {
+        const planos = extrairListaPaginada(planosRes.value)
+        const planosMapeados = planos.map((p) => ({
+          id: p.id,
+          titulo: p.title,
+          prazo: p.deadline ? formatarDataBR(p.deadline) : 'Em andamento',
+          concluido: Boolean(p.completed),
+          conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
         }))
+        setPlanoDeAcao(planosMapeados)
+        setPlanoVersao((v) => v + 1)
       }
 
-      // 2. Buscar próxima mentoria real no backend
-      try {
-        const next = await mentoringService.getNextMentoring()
-        if (next && next.id) {
-          const dataObj = new Date(next.scheduledAt)
-          setProximaMentoria({
-            id: next.id,
-            especialistaId: next.specialist?.id || 1,
-            especialistaNome: next.specialist?.user?.name || 'Conselheiro Sábios',
-            especialistaDescricao: next.specialist?.specialty || next.title,
-            especialistaFoto: next.specialist?.user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-            data: dataObj.toLocaleDateString('pt-BR'),
-            horario: dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-            emBreveTexto: 'Agendada',
-            linkChamada: next.meetingLink || 'https://meet.google.com/new',
-            perguntasAnotadas: next.doubts ? [next.doubts] : [],
-          })
-        }
-      } catch (err) {
-        console.warn('Usando próxima mentoria padrão ou vazia:', err)
-      }
-
-      // 3. Buscar planos de ação reais no backend
-      try {
-        const planos = await actionPlanService.list()
-        if (planos && planos.length > 0) {
-          const planosMapeados = planos.map((p) => ({
-            id: p.id,
-            titulo: p.title,
-            prazo: p.deadline ? new Date(p.deadline).toLocaleDateString('pt-BR') : 'Em andamento',
-            concluido: p.completed,
-            conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
-          }))
-          setPlanoDeAcao(planosMapeados)
-        }
-      } catch (err) {
-        console.warn('Usando planos de ação padrão:', err)
+      if (espRes.status === 'fulfilled') {
+        setConselheirosRecomendados(
+          extrairListaPaginada(espRes.value).map(mapearEspecialistaApi),
+        )
       }
     }
 
     carregarDadosDashboard()
+    return () => {
+      ativo = false
+    }
   }, [user])
 
   const abas = [
@@ -82,10 +99,11 @@ export default function UsuarioClientePage() {
     {
       id: 'historico',
       icone: History,
-      rotulo: 'Histórico de Mentorias Realizadas',
-      contador: cliente.historicoMentorias.length,
+      rotulo: 'Histórico de Mentorias',
+      contador: historicoMentorias.length,
     },
   ]
+
   const dicas = [
     {
       destaque: 'Traga seus números e dúvidas reais',
@@ -117,7 +135,10 @@ export default function UsuarioClientePage() {
           className="mt-8 motion-safe:animate-aparecer"
           style={{ animationDelay: '60ms' }}
         >
-          <ProximaMentoriaCliente mentoria={proximaMentoria} />
+          <ProximaMentoriaCliente
+            key={proximaMentoria?.id ?? 'sem-mentoria'}
+            mentoria={proximaMentoria}
+          />
         </div>
 
         {/* Plano de Ação das Mentorias */}
@@ -125,7 +146,7 @@ export default function UsuarioClientePage() {
           className="mt-8 motion-safe:animate-aparecer"
           style={{ animationDelay: '120ms' }}
         >
-          <PlanoDeAcaoCliente acoesIniciais={planoDeAcao} />
+          <PlanoDeAcaoCliente key={planoVersao} acoesIniciais={planoDeAcao} />
         </div>
 
         {/* Abas: Conselheiros Recomendados & Histórico */}
@@ -138,13 +159,13 @@ export default function UsuarioClientePage() {
           <div className="mt-6">
             {abaAtiva === 'plano' && (
               <ConselheirosRecomendadosCliente
-                conselheiros={cliente.conselheirosRecomendados}
+                conselheiros={conselheirosRecomendados}
               />
             )}
 
             {abaAtiva === 'historico' && (
               <HistoricoMentoriasCliente
-                historico={cliente.historicoMentorias}
+                historico={historicoMentorias}
               />
             )}
           </div>

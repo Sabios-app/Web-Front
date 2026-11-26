@@ -18,7 +18,13 @@ const configuracoes = {
   },
 }
 
-export default function EstadoInterface({ tipo, acao, rotuloAcao = 'Tentar novamente' }) {
+export default function EstadoInterface({
+  tipo,
+  titulo,
+  descricao,
+  acao,
+  rotuloAcao = 'Tentar novamente',
+}) {
   const estado = configuracoes[tipo]
   if (!estado) return null
 
@@ -34,8 +40,8 @@ export default function EstadoInterface({ tipo, acao, rotuloAcao = 'Tentar novam
         size={34}
         className={`mb-4 text-dourado-escuro ${tipo === 'carregando' ? 'animate-spin motion-reduce:animate-none' : ''}`}
       />
-      <h2 className="font-titulo text-2xl text-verde-titulo">{estado.titulo}</h2>
-      <p className="mt-2 max-w-md text-texto-secundario">{estado.descricao}</p>
+      <h2 className="font-titulo text-2xl text-verde-titulo">{titulo || estado.titulo}</h2>
+      <p className="mt-2 max-w-md text-texto-secundario">{descricao || estado.descricao}</p>
       {acao && tipo === 'erro' && (
         <button
           type="button"
