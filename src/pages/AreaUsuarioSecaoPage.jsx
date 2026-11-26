@@ -72,62 +72,91 @@ export default function AreaUsuarioSecaoPage({ perfil }) {
   const [planoVersao, setPlanoVersao] = useState(0)
 
   useEffect(() => {
-    if (perfil !== 'cliente') return undefined
     let ativo = true
 
-    async function carregarSecaoCliente() {
-      const [nextRes, listRes, planosRes] = await Promise.allSettled([
-        mentoringService.getNextMentoring(),
-        mentoringService.listMyMentorings(),
-        actionPlanService.list(),
-      ])
+    async function carregarDados() {
+      if (perfil === 'cliente') {
+        const [nextRes, listRes, planosRes] = await Promise.allSettled([
+          mentoringService.getNextMentoring(),
+          mentoringService.listMyMentorings(),
+          actionPlanService.list(),
+        ])
 
-      if (!ativo) return
+        if (!ativo) return
 
-      if (nextRes.status === 'fulfilled' && nextRes.value && nextRes.value.id) {
-        setProximaMentoria(mapearMentoriaApi(nextRes.value))
-      } else {
-        setProximaMentoria(null)
-      }
+        if (nextRes.status === 'fulfilled' && nextRes.value && nextRes.value.id) {
+          setProximaMentoria(mapearMentoriaApi(nextRes.value))
+        } else {
+          setProximaMentoria(null)
+        }
 
-      if (listRes.status === 'fulfilled') {
-        setHistoricoMentorias(
-          extrairListaPaginada(listRes.value).map(mapearMentoriaApi),
-        )
-      }
+        if (listRes.status === 'fulfilled') {
+          setHistoricoMentorias(
+            extrairListaPaginada(listRes.value).map(mapearMentoriaApi),
+          )
+        }
 
-      if (planosRes.status === 'fulfilled') {
-        const planos = extrairListaPaginada(planosRes.value)
-        setPlanoDeAcao(
-          planos.map((p) => ({
-            id: p.id,
-            titulo: p.title,
-            // prefer dueDate, fall back to legacy deadline
-            dueDate: p.dueDate ?? null,
-            prazo: p.dueDate
-              ? new Date(p.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
-              : p.deadline
-              ? formatarDataBR(p.deadline)
-              : 'Sem prazo',
-            concluido: Boolean(p.completed),
-            overdue: Boolean(p.overdue),
-            assignedByCounselor: Boolean(p.assignedByCounselor),
-            completedAt: p.completedAt ?? null,
-            mentoringId: p.mentoringId ?? null,
-            conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
-          })),
-        )
-        setPlanoVersao((v) => v + 1)
+        if (planosRes.status === 'fulfilled') {
+          const planos = extrairListaPaginada(planosRes.value)
+          setPlanoDeAcao(
+            planos.map((p) => ({
+              id: p.id,
+              titulo: p.title,
+              dueDate: p.dueDate ?? null,
+              prazo: p.dueDate
+                ? new Date(p.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                : p.deadline
+                ? formatarDataBR(p.deadline)
+                : 'Sem prazo',
+              concluido: Boolean(p.completed),
+              overdue: Boolean(p.overdue),
+              assignedByCounselor: Boolean(p.assignedByCounselor),
+              completedAt: p.completedAt ?? null,
+              mentoringId: p.mentoringId ?? null,
+              conselheiro: p.conselheiroNome || 'Conselheiro Sábios',
+            })),
+          )
+          setPlanoVersao((v) => v + 1)
+        }
+      } else if (perfil === 'conselheiro') {
+        const [nextRes, listRes] = await Promise.allSettled([
+          mentoringService.getNextMentoring(),
+          mentoringService.listMyMentorings(),
+        ])
+
+        if (!ativo) return
+
+        if (nextRes.status === 'fulfilled' && nextRes.value && nextRes.value.id) {
+          setProximaMentoria(mapearMentoriaApi(nextRes.value))
+        } else {
+          setProximaMentoria(null)
+        }
+
+        if (listRes.status === 'fulfilled') {
+          setHistoricoMentorias(
+            extrairListaPaginada(listRes.value).map(mapearMentoriaApi),
+          )
+        }
       }
     }
 
-    carregarSecaoCliente()
+    carregarDados()
     return () => {
       ativo = false
     }
   }, [perfil])
 
   const usuarioBase = perfil === 'cliente' ? dadosCliente : dadosConselheiro
+  const sessoesAgendadasConselheiro =
+    historicoMentorias.length > 0
+      ? historicoMentorias
+      : usuarioBase.sessoesAgendadas || []
+
+  const solicitacoesPendentesConselheiro =
+    historicoMentorias.filter((m) => m.status === 'PENDING').length > 0
+      ? historicoMentorias.filter((m) => m.status === 'PENDING')
+      : usuarioBase.solicitacoesPendentes || []
+
   const usuario =
     perfil === 'cliente'
       ? {
@@ -142,6 +171,10 @@ export default function AreaUsuarioSecaoPage({ perfil }) {
           ...usuarioBase,
           nome: user?.name || usuarioBase.nome,
           foto: user?.avatarUrl || usuarioBase.foto,
+          proximaMentoria,
+          historicoMentorias,
+          sessoesAgendadas: sessoesAgendadasConselheiro,
+          solicitacoesPendentes: solicitacoesPendentesConselheiro,
         }
 
   const titulo = titulos[perfil]?.[secao] ?? 'Área do usuário'
