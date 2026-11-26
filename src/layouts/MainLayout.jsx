@@ -1,4 +1,5 @@
 import Cabecalho from './Cabecalho'
+import BotaoTema from '../components/BotaoTema'
 import PainelAcessibilidade from './PainelAcessibilidade'
 import Rodape from './Rodape'
 
@@ -17,6 +18,7 @@ export default function MainLayout({ children }) {
         {children}
       </main>
       <Rodape />
+      <BotaoTema />
       <PainelAcessibilidade />
     </div>
   )

@@ -14,10 +14,12 @@
   --color-dourado-claro: #efc36e;
   --color-dourado-foco: #c78a3c;
   --color-dourado-aviso: #fff1d7;
+  --color-dourado-texto: var(--color-verde-petroleo);
 
   /* fundos e neutros */
   --color-creme: #f8f7f2;
   --color-campo: #eef1eb;
+  --color-superficie: #ffffff;
   --color-divisoria: #e1e5df;
   --color-texto-secundario: #607674;
   --color-descricao: #667b79;
@@ -64,6 +66,37 @@ body {
   font-size: 1.0625rem; /* 17px: um pouco maior que o padrão para o público 50+ */
 }
 
+html[data-tema="escuro"] {
+  color-scheme: dark;
+  --color-creme: #102d2c;
+  --color-campo: #203d39;
+  --color-superficie: #173b3a;
+  --color-divisoria: #31514c;
+  --color-texto-secundario: #b5c8bf;
+  --color-descricao: #c3d2c9;
+  --color-dourado-escuro: #efc36e;
+  --color-dourado-aviso: #51452f;
+  --color-dourado-texto: #efc36e;
+}
+
+html[data-tema="escuro"] .bg-white,
+html[data-tema="escuro"] [class~="bg-white/70"] {
+  background-color: var(--color-superficie);
+}
+
+html[data-tema="escuro"] [class~="hover:bg-white/70"]:hover {
+  background-color: var(--color-superficie);
+}
+
+html[data-tema="escuro"] .text-verde-petroleo,
+html[data-tema="escuro"] .text-verde-titulo {
+  color: #e7efe9;
+}
+
+html[data-tema="escuro"] .text-verde-icone {
+  color: #9fbfb3;
+}
+
 /* "Texto maior": o Tailwind usa rem, então aumentar a fonte do <html>
    aumenta textos, botões e espaçamentos de uma vez. */
 html[data-texto-maior] {
@@ -83,12 +116,21 @@ html[data-alto-contraste] {
   --color-dourado-claro: #ffd23f;
   --color-dourado-foco: #c78a3c;
   --color-dourado-aviso: #fff3c4;
+  --color-dourado-texto: #000000;
   --color-dourado-areia: #ffe58a;
   --color-creme: #ffffff;
   --color-campo: #f2f2f2;
+  --color-superficie: #ffffff;
   --color-divisoria: #000000;
   --color-texto-secundario: #000000;
   --color-descricao: #000000;
+  color-scheme: light;
+}
+
+html[data-alto-contraste] .text-verde-petroleo,
+html[data-alto-contraste] .text-verde-titulo,
+html[data-alto-contraste] .text-verde-icone {
+  color: #000000;
 }
 
 /* "Modo simples": esconde o que tiver a classe so-completo */

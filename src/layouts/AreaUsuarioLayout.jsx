@@ -2,6 +2,7 @@ import { menusUsuario } from '../data/menusUsuario'
 import useAuth from '../hooks/useAuth'
 import BarraLateralUsuario from './BarraLateralUsuario'
 import CabecalhoUsuario from './CabecalhoUsuario'
+import BotaoTema from '../components/BotaoTema'
 import PainelAcessibilidade from './PainelAcessibilidade'
 
 export default function AreaUsuarioLayout({ children, usuario }) {
@@ -25,6 +26,7 @@ export default function AreaUsuarioLayout({ children, usuario }) {
         </main>
       </div>
 
+      <BotaoTema />
       <PainelAcessibilidade />
     </div>
   )

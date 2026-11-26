@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import BotaoTema from '../components/BotaoTema'
 import LogoSabios from '../components/LogoSabios'
 
 export default function AuthLayout({ children }) {
@@ -32,6 +33,7 @@ export default function AuthLayout({ children }) {
           {children}
         </div>
       </main>
+      <BotaoTema />
     </div>
   )
 }
