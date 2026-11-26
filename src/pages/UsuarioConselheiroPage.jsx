@@ -80,25 +80,37 @@ export default function UsuarioConselheiroPage() {
     <AreaUsuarioLayout usuario={conselheiro}>
       <div className="mx-auto max-w-275">
         {/* Banner de topo do Conselheiro */}
-        <CabecalhoConselheiro
-          conselheiro={conselheiro}
-          disponivel={disponivel}
-          onAlternarDisponibilidade={alternarDisponibilidade}
-          onAbrirDisponibilidade={irParaDisponibilidade}
-        />
+        <div className="motion-safe:animate-aparecer">
+          <CabecalhoConselheiro
+            conselheiro={conselheiro}
+            disponivel={disponivel}
+            onAlternarDisponibilidade={alternarDisponibilidade}
+            onAbrirDisponibilidade={irParaDisponibilidade}
+          />
+        </div>
 
         {/* Métricas e resumo de impacto */}
-        <div className="mt-8">
+        <div
+          className="mt-8 motion-safe:animate-aparecer"
+          style={{ animationDelay: '60ms' }}
+        >
           <MetricasConselheiro metricas={conselheiro.metricas} />
         </div>
 
         {/* Próxima mentoria (Destaque urgente) */}
-        <div className="mt-8">
+        <div
+          className="mt-8 motion-safe:animate-aparecer"
+          style={{ animationDelay: '120ms' }}
+        >
           <ProximaSessaoConselheiro sessao={conselheiro.proximaSessao} />
         </div>
 
         {/* Seção com Abas de Gestão */}
-        <div id="secao-abas" className="mt-10">
+        <div
+          id="secao-abas"
+          className="mt-10 motion-safe:animate-aparecer"
+          style={{ animationDelay: '180ms' }}
+        >
           <NavegacaoAbas
             id="abas-gestao"
             abas={abas}

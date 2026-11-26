@@ -27,13 +27,14 @@
   /* fontes */
   --font-titulo: "Lora", serif;
   --font-corpo: "DM Sans", sans-serif;
- --animate-aparecer: aparecer 0.4s ease-out both;
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+ --animate-aparecer: aparecer 0.5s var(--ease-suave) both;
  --animate-seta-scroll: seta-scroll 1.6s ease-in-out infinite;
 
   @keyframes aparecer {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;
@@ -57,10 +58,6 @@ body {
   font-family: var(--font-corpo);
   background: var(--color-creme);
   color: var(--color-verde-petroleo);
-
-
-   /* animações */
-  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
 }
 body {
   font-size: 1.0625rem; /* 17px: um pouco maior que o padrão para o público 50+ */
@@ -186,5 +183,6 @@ html {
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
+    animation: none !important;
   }
 }
