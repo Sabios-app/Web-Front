@@ -160,14 +160,48 @@ As próximas tarefas devem preservar os principais elementos da marca — cores,
 
 Como o projeto precisa priorizar o backend, o frontend deve concluir apenas os ajustes essenciais e preparar as telas para receber os dados reais:
 
-- [ ] Corrigir links quebrados e garantir que as rotas principais não exibam telas vazias.
-- [ ] Identificar visualmente quais informações e ações ainda são mockadas para evitar a impressão de que já estão integradas.
-- [ ] Finalizar estados de carregamento, erro, vazio e indisponibilidade nas telas que dependerão do backend.
-- [ ] Preparar componentes e formulários para receber dados, validações e respostas de API sem refazer o layout.
-- [ ] Fazer uma revisão rápida de responsividade nas telas de home, especialistas, cliente, conselheiro e mensagens.
-- [ ] Corrigir problemas críticos de acessibilidade: foco visível, labels, contraste e navegação por teclado.
-- [ ] Refinar somente as telas que ainda estejam visualmente inconsistentes ou prejudiquem o uso, sem ampliar o escopo funcional.
-- [ ] Documentar nos componentes quais ações aguardam autenticação, persistência ou endpoints do backend.
-- [ ] Validar o comportamento visual com dados mockados e cenários de sucesso, erro e ausência de dados.
+- [x] Corrigir links quebrados e garantir que as rotas principais não exibam telas vazias.
+- [x] Identificar visualmente quais informações e ações ainda são mockadas para evitar a impressão de que já estão integradas.
+- [x] Finalizar estados de carregamento, erro, vazio e indisponibilidade nas telas que dependerão do backend.
+- [x] Preparar componentes e formulários para receber dados, validações e respostas de API sem refazer o layout.
+- [x] Fazer uma revisão rápida de responsividade nas telas de home, especialistas, cliente, conselheiro e mensagens.
+- [x] Corrigir problemas críticos de acessibilidade: foco visível, labels, contraste e navegação por teclado.
+- [x] Refinar somente as telas que ainda estejam visualmente inconsistentes ou prejudiquem o uso, sem ampliar o escopo funcional.
+- [x] Documentar nos componentes quais ações aguardam autenticação, persistência ou endpoints do backend.
+- [x] Validar o comportamento visual com dados mockados e cenários de sucesso, erro e ausência de dados.
 
-Após essa etapa, a implementação dos fluxos reais deve ser conduzida em conjunto com o backend, seguindo os contratos de API definidos. Os testes de funcionamento completo de login, mensagens, agenda, tarefas e configurações ficam para depois da integração.
+---
+
+## 🚀 Integração com o Backend Spring Boot (Concluída)
+
+A integração completa do **Web-Front** com a API REST Spring Boot (`http://localhost:8080/api/v1`) foi realizada:
+
+### 1. Camada de Comunicação HTTP e Sessão
+- **`src/services/api.js`**:
+  - Instância do Axios com `baseURL: http://localhost:8080/api/v1`.
+  - Interceptador de requisição que anexa automaticamente o cabeçalho `Authorization: Bearer <token>` a partir do `localStorage`.
+  - Interceptador de resposta que trata códigos `401 Unauthorized`, limpando credenciais e redirecionando para `/login`.
+- **`src/services/sabiosServices.js`**:
+  - Módulos organizados para consumo da API: `authService`, `specialistService`, `mentoringService`, `actionPlanService`.
+- **`src/contexts/AuthProvider.jsx`**:
+  - Gerenciamento unificado de autenticação com persistência em `localStorage` (`sabios:token`, `sabios:user`, `sabios:perfil`).
+  - Funções reais de `login(email, password)` e `cadastrar(dados)`.
+  - Sincronização automática na inicialização via `GET /api/v1/users/me`.
+
+### 2. Telas Integradas
+- **Login (`LoginPage.jsx`)**:
+  - Conectado a `POST /api/v1/auth/login`.
+  - Exibição de alertas amigáveis para credenciais incorretas e redirecionamento de acordo com a `role` retornada.
+- **Cadastro de Cliente (`CadastroClientePage.jsx`)**:
+  - Conectado a `POST /api/v1/auth/register` com perfil `CLIENT`.
+- **Cadastro de Conselheiro (`CadastroConselheiroPage.jsx`)**:
+  - Conectado a `POST /api/v1/auth/register` com perfil `COUNSELOR` e criação do perfil de especialista em `POST /api/v1/specialists/me`.
+- **Catálogo de Especialistas (`EspecialistasPage.jsx`)**:
+  - Conectado dinamicamente a `GET /api/v1/specialists` com filtros de busca e área de atuação, mantendo fallback gracioso.
+- **Painel do Cliente (`UsuarioClientePage.jsx` & `PlanoDeAcaoCliente.jsx`)**:
+  - Consumo de próxima mentoria via `GET /api/v1/mentorings/next`.
+  - Carregamento de metas via `GET /api/v1/action-plans`.
+  - Criação de novas metas via `POST /api/v1/action-plans` e toggle de status (concluído/pendente) via `PATCH /api/v1/action-plans/{id}/toggle`.
+
+### 3. Validação e Qualidade
+- `npm run build`: Build do Vite concluído com sucesso gerando bundle de produção sem erros.

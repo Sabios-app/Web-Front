@@ -8,20 +8,28 @@ import AuthLayout from "../layouts/AuthLayout";
 import fotoLogin from "../assets/homeLogin.jpg";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-  const { entrar } = useAuth();
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [tipoPerfil, setTipoPerfil] = useState("conselheiro");
+  const navigate = useNavigate()
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [tipoPerfil, setTipoPerfil] = useState('conselheiro')
+  const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(false)
 
-  function handleLogin(e) {
-    e.preventDefault();
-    entrar(tipoPerfil);
-    navigate(
-      tipoPerfil === "conselheiro"
-        ? "/usuario/conselheiro"
-        : "/usuario/cliente",
-    );
+  async function handleLogin(e) {
+    e.preventDefault()
+    setErro('')
+    setCarregando(true)
+
+    try {
+      const perfilRetornado = await login(email, senha)
+      navigate(perfilRetornado === 'conselheiro' ? '/usuario/conselheiro' : '/usuario/cliente')
+    } catch (err) {
+      const msg = err.response?.data?.message || 'E-mail ou senha inválidos. Tente novamente.'
+      setErro(msg)
+    } finally {
+      setCarregando(false)
+    }
   }
 
   return (
@@ -39,33 +47,11 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Escolha do tipo de acesso rápido */}
-        <div className="mt-6 rounded-2xl border border-divisoria bg-campo/60 p-1.5 flex gap-1">
-          <button
-            type="button"
-            onClick={() => setTipoPerfil("conselheiro")}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-              tipoPerfil === "conselheiro"
-                ? "bg-verde-petroleo text-white shadow-xs"
-                : "text-texto-secundario hover:text-verde-petroleo"
-            }`}
-          >
-            <Star size={16} />
-            Conselheiro
-          </button>
-          <button
-            type="button"
-            onClick={() => setTipoPerfil("cliente")}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition ${
-              tipoPerfil === "cliente"
-                ? "bg-verde-petroleo text-white shadow-xs"
-                : "text-texto-secundario hover:text-verde-petroleo"
-            }`}
-          >
-            <Briefcase size={16} />
-            Cliente
-          </button>
-        </div>
+        {erro && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
+            {erro}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="mt-6 space-y-4">
           <CampoTexto
@@ -74,6 +60,7 @@ export default function LoginPage() {
             placeholder="seuemail@exemplo.com"
             valor={email}
             aoMudar={(e) => setEmail(e.target.value)}
+            obrigatorio
           />
 
           <div>
@@ -97,14 +84,14 @@ export default function LoginPage() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="••••••••"
+              required
               className="h-14 w-full rounded-xl border border-divisoria bg-white px-4 text-lg text-verde-petroleo placeholder:text-texto-secundario/70 transition-all duration-200 focus:border-dourado-foco focus:outline-none! focus:ring-2 focus:ring-dourado-foco/15 focus:ring-offset-0"
             />
           </div>
 
           <div className="pt-2">
-            <Botao type="submit">
-              Entrar como{" "}
-              {tipoPerfil === "conselheiro" ? "Conselheiro" : "Cliente"}
+            <Botao type="submit" desabilitado={carregando}>
+              {carregando ? 'Entrando...' : 'Entrar na plataforma'}
             </Botao>
           </div>
         </form>

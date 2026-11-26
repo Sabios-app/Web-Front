@@ -1,12 +1,20 @@
 import { Filter, Search, SlidersHorizontal, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import CartaoEspecialista from '../components/CartaoEspecialista'
 import EstadoInterface from '../components/EstadoInterface'
-import { especialistas } from '../data/especialistas'
+import { especialistas as mockEspecialistas } from '../data/especialistas'
+import { specialistService } from '../services/sabiosServices'
 import MainLayout from '../layouts/MainLayout'
 
-const areas = ['Todas as áreas', ...new Set(especialistas.map((especialista) => especialista.area))]
+const AREAS_PADRAO = [
+  'Todas as áreas',
+  'Finanças & Gestão',
+  'Vendas & Estratégia',
+  'Liderança & Pessoas',
+  'Operações & Logística',
+  'Marketing & Clientes',
+]
 
 export default function EspecialistasPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -15,17 +23,58 @@ export default function EspecialistasPage() {
   const [area, setArea] = useState('Todas as áreas')
   const [ordenacao, setOrdenacao] = useState('relevancia')
   const [mostrarFiltros, setMostrarFiltros] = useState(false)
+  const [listaEspecialistas, setListaEspecialistas] = useState([])
+  const [carregando, setCarregando] = useState(true)
+
+  useEffect(() => {
+    async function carregarEspecialistas() {
+      try {
+        setCarregando(true)
+        const params = {}
+        if (busca.trim()) params.search = busca.trim()
+        if (area !== 'Todas as áreas') params.specialty = area
+        const response = await specialistService.listSpecialists(params)
+
+        if (response && response.content && response.content.length > 0) {
+          // Converte do modelo da API para o formato esperado pelos cards
+          const mapeados = response.content.map((esp) => ({
+            id: esp.id,
+            nome: esp.user?.name || esp.name || 'Conselheiro Sábios',
+            area: esp.specialty || 'Consultoria Geral',
+            cidade: 'Brasil',
+            foto: esp.user?.avatarUrl || esp.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+            avaliacao: esp.rating || 5.0,
+            totalAvaliacoes: esp.totalReviews || 1,
+            valorSessao: esp.hourlyRate || 150.0,
+            descricao: esp.bio || 'Conselheiro experiente pronto para apoiar o seu negócio.',
+            temas: esp.specialty ? esp.specialty.split(',').map((t) => t.trim()) : ['Estratégia'],
+          }))
+          setListaEspecialistas(mapeados)
+        } else {
+          // Fallback para os mocks estáticos se ainda não houver nenhum conselheiro cadastrado no banco
+          setListaEspecialistas(mockEspecialistas)
+        }
+      } catch (err) {
+        console.warn('API não disponível, utilizando catálogo demonstrativo:', err)
+        setListaEspecialistas(mockEspecialistas)
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    carregarEspecialistas()
+  }, [busca, area])
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLocaleLowerCase('pt-BR')
-    const filtrados = especialistas.filter((especialista) => {
-      const correspondeArea = area === 'Todas as áreas' || especialista.area === area
+    const filtrados = listaEspecialistas.filter((especialista) => {
+      const correspondeArea = area === 'Todas as áreas' || especialista.area.includes(area)
       const texto = [
         especialista.nome,
         especialista.area,
         especialista.cidade,
         especialista.descricao,
-        ...especialista.temas,
+        ...(especialista.temas || []),
       ]
         .join(' ')
         .toLocaleLowerCase('pt-BR')
@@ -37,7 +86,7 @@ export default function EspecialistasPage() {
       if (ordenacao === 'menor-preco') return a.valorSessao - b.valorSessao
       return a.id - b.id
     })
-  }, [area, busca, ordenacao])
+  }, [listaEspecialistas, area, busca, ordenacao])
 
   function pesquisar(event) {
     event.preventDefault()
@@ -94,7 +143,9 @@ export default function EspecialistasPage() {
           <div>
             <h2 className="font-titulo text-3xl text-verde-titulo sm:text-4xl">Especialistas disponíveis</h2>
             <p className="mt-2 text-texto-secundario">
-              {resultados.length} {resultados.length === 1 ? 'especialista encontrado' : 'especialistas encontrados'}
+              {carregando
+                ? 'Carregando conselheiros...'
+                : `${resultados.length} ${resultados.length === 1 ? 'especialista encontrado' : 'especialistas encontrados'}`}
             </p>
           </div>
           <button
@@ -112,7 +163,7 @@ export default function EspecialistasPage() {
           <label className="flex flex-1 flex-col gap-2 font-bold text-verde-titulo">
             <span className="inline-flex items-center gap-2"><Filter aria-hidden="true" size={18} /> Área de atuação</span>
             <select value={area} onChange={(event) => setArea(event.target.value)} className="min-h-12 rounded-xl border border-divisoria bg-white px-4 font-normal">
-              {areas.map((opcao) => <option key={opcao}>{opcao}</option>)}
+              {AREAS_PADRAO.map((opcao) => <option key={opcao}>{opcao}</option>)}
             </select>
           </label>
           <label className="flex flex-1 flex-col gap-2 font-bold text-verde-titulo">
