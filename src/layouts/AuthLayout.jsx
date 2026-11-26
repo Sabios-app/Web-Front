@@ -1,6 +1,7 @@
-import { ArrowLeft, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
-import LogoSabios from "../components/LogoSabios";
+import { ArrowLeft, Heart } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import BotaoTema from '../components/BotaoTema'
+import LogoSabios from '../components/LogoSabios'
 
 export default function AuthLayout({ children, imagem }) {
   return (
@@ -48,6 +49,7 @@ export default function AuthLayout({ children, imagem }) {
           {children}
         </div>
       </main>
+      <BotaoTema />
     </div>
   );
 }
