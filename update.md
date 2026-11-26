@@ -205,3 +205,51 @@ A integração completa do **Web-Front** com a API REST Spring Boot (`http://loc
 
 ### 3. Validação e Qualidade
 - `npm run build`: Build do Vite concluído com sucesso gerando bundle de produção sem erros.
+
+---
+
+## Atualização de 26/11/2026
+
+Resumo das mudanças recentes realizadas após a integração inicial da API (incluindo os ajustes de tema/login e a refatoração de autenticação, erros e mentorias):
+
+### 1. Tema claro/escuro e tela de login
+- **Alternância de tema**: adicionados `BotaoTema` (`src/components/BotaoTema.jsx`), `TemaProvider` (`src/contexts/TemaProvider.jsx`), `TemaContext` (`src/contexts/TemaContext.js`), `TemaPreferencia` (`src/contexts/TemaPreferencia.js`) e `useTema` (`src/hooks/useTema.js`), integrados em `MainLayout.jsx`, `AreaUsuarioLayout.jsx` e `AuthLayout.jsx` com suporte de estilos em `src/index.css`.
+- **Painel lateral no login**: adicionada a imagem `src/assets/homeLogin.jpg` no painel lateral de autenticação (`src/layouts/AuthLayout.jsx` e `src/pages/LoginPage.jsx`).
+
+### 2. Autenticação, sessão e tratamento de erros
+- **Sessão centralizada (`src/utils/authStorage.js` e `src/contexts/AuthProvider.jsx`)**:
+  - Centralização de leitura, gravação e limpeza da sessão no `localStorage`, além do controle de aviso de sessão expirada no `sessionStorage`.
+  - Sincronização automática do estado de autenticação quando ocorre expiração de sessão (`EVENTO_SESSAO_EXPIRADA`).
+- **Interceptor de resposta (`src/services/apiInterceptor.js` e `src/services/api.js`)**:
+  - Respostas `401` em rotas protegidas limpam a sessão, marcam a expiração e redirecionam para `/login?motivo=sessao-expirada`.
+  - Respostas `401` no próprio endpoint de login não disparam limpeza/redirecionamento, permitindo exibir a mensagem de erro no formulário.
+- **Erros padronizados e bloqueio temporário (`src/utils/apiError.js` e `src/hooks/useBloqueioPorTentativas.js`)**:
+  - Leitura padronizada de erros da API, extração de erros por campo (`status 400`) e interpretação de `Retry-After` para respostas `429`.
+  - Adicionado bloqueio temporário com contagem regressiva nos formulários quando houver excesso de tentativas (`429`).
+- **Formulários atualizados**:
+  - `LoginPage.jsx`, `CadastroClientePage.jsx`, `CadastroConselheiroPage.jsx` e `RecuperarSenhaPage.jsx` agora exibem erros por campo em `CampoTexto.jsx` e alertas padronizados com `AlertaFormulario` (`src/components/feedback/AlertaFormulario.jsx`).
+  - `RecuperarSenhaPage.jsx` conectada a `authService.forgotPassword` (`POST /auth/forgot-password` em `src/services/sabiosServices.js`).
+
+### 3. Especialistas, agendamento e mentorias
+- **Mapeamento e formatação (`src/utils/especialistaMapper.js` e `src/utils/formatadores.js`)**:
+  - Conversão centralizada de especialistas, avaliações, listas paginadas e mentorias retornadas pela API.
+  - `mapearMentoriaApi` mantém `linkChamada` como `null` quando `meetingLink` vem `null` da API, sem gerar links fictícios.
+- **Páginas de especialistas e agendamento**:
+  - `SecaoEspecialistas.jsx` (Home) e `EspecialistasPage.jsx` integradas à API com estados de carregamento, erro (com tentativa de recarregamento) e vazio via `EstadoInterface.jsx`.
+  - `PerfilEspecialistaPage.jsx` conectada a `specialistService.getById`, exibindo carregamento, erro ou página de não encontrado (`404`/`400`).
+  - `CardAgendamento.jsx` integrado ao envio de solicitação de mentoria, com campos de data/hora, assunto e dúvidas, validação por campo e orientação para login caso não autenticado.
+- **Status, filtros e área do usuário**:
+  - Criado `src/utils/mentoriaStatus.js` com os status `REQUESTED`, `CONFIRMED`, `COMPLETED`, `REJECTED`, `CANCELED` e `EXPIRED`, além de `BadgeStatusMentoria.jsx` e `FiltroStatusMentoria.jsx`.
+  - `UsuarioClientePage.jsx` e `AreaUsuarioSecaoPage.jsx` integrados aos dados reais de próxima mentoria, histórico de mentorias e plano de ação.
+  - `HistoricoMentoriasCliente.jsx` e `ListaSessoesConselheiro.jsx` atualizados com filtro por status, badges e exibição do link da sala apenas quando informado pela API e a sessão não estiver encerrada.
+
+### 4. Testes unitários e verificação
+- Adicionados testes unitários com `node:test`:
+  - `src/contexts/TemaPreferencia.test.js`
+  - `src/services/api.test.js`
+  - `src/utils/apiError.test.js`
+  - `src/utils/especialistaMapper.test.js`
+  - `src/utils/mentoriaStatus.test.js`
+- Verificações executadas:
+  - `npm run lint` concluído sem erros.
+  - `node --test src/utils/*.test.js src/services/*.test.js src/contexts/*.test.js` executado com 15 testes aprovados e 0 falhas.
