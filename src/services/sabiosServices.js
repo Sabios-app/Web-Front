@@ -264,7 +264,6 @@ export const messageService = {
     return response.data;
   },
 };
-}
 
 export const agendaService = {
   /**
