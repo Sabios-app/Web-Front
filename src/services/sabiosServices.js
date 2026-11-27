@@ -247,3 +247,56 @@ export const messageService = {
     return response.data
   },
 }
+
+export const agendaService = {
+  /**
+   * Consulta horários de atendimento públicos de um especialista.
+   */
+  async getBySpecialist(specialistId) {
+    const response = await api.get(`/agenda/specialists/${specialistId}`)
+    return response.data
+  },
+
+  /**
+   * Consulta horários livres (slots de datas e horas) de um especialista.
+   * @param {string} specialistId
+   * @param {string} from - Data ISO YYYY-MM-DD
+   * @param {string} to - Data ISO YYYY-MM-DD
+   */
+  async getSlots(specialistId, from, to) {
+    const response = await api.get(`/agenda/specialists/${specialistId}/slots`, {
+      params: { from, to },
+    })
+    return response.data
+  },
+
+  /**
+   * Lista os horários cadastrados pelo conselheiro logado.
+   */
+  async getMyAgenda() {
+    const response = await api.get('/agenda/me')
+    return response.data
+  },
+
+  /**
+   * Conselheiro adiciona um novo intervalo semanal disponível.
+   * @param {{ dayOfWeek: string, startTime: string, endTime: string }} data
+   */
+  async createAvailability({ dayOfWeek, startTime, endTime }) {
+    const response = await api.post('/agenda', {
+      dayOfWeek: dayOfWeek.toUpperCase(),
+      startTime,
+      endTime,
+    })
+    return response.data
+  },
+
+  /**
+   * Conselheiro remove um intervalo de disponibilidade por ID.
+   */
+  async removeAvailability(id) {
+    const response = await api.delete(`/agenda/${id}`)
+    return response.data
+  },
+}
+
