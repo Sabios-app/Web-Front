@@ -87,9 +87,16 @@ export const mentoringService = {
   },
 
   async getNextMentoring() {
+  try {
     const response = await api.get("/mentorings/next");
     return response.data;
-  },
+  } catch (error) {
+    if (error?.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+},
 
   async accept(id) {
     const response = await api.patch(`/mentorings/${id}/accept`);
