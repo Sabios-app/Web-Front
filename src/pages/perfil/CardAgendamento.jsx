@@ -1,15 +1,15 @@
-import { CalendarCheck, Lock, Video } from 'lucide-react'
-import { useState } from 'react'
+import { CalendarCheck, Clock, Loader2, Lock, Video } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AlertaFormulario from '../../components/feedback/AlertaFormulario'
 import useAuth from '../../hooks/useAuth'
-import { mentoringService } from '../../services/sabiosServices'
+import { agendaService, mentoringService } from '../../services/sabiosServices'
 import { extrairErrosDeCampo, parseApiError } from '../../utils/apiError'
 import { formatarReais } from '../../utils/formatadores'
 
 const estiloOpcao =
-  'flex min-h-14 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 px-2 text-center text-lg font-semibold transition-colors'
-const opcaoAtiva = 'border-verde-petroleo bg-verde-petroleo text-white'
+  'flex min-h-14 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 px-3 py-2 text-center text-sm font-semibold transition-colors'
+const opcaoAtiva = 'border-verde-petroleo bg-verde-petroleo text-white shadow-sm'
 const opcaoInativa = 'border-divisoria bg-white text-verde-titulo hover:border-verde-petroleo'
 
 const ALIASES_AGENDAMENTO = {
@@ -21,11 +21,11 @@ const CAMPOS_AGENDAMENTO = ['dataHora', 'assunto', 'duvidas']
 
 export default function CardAgendamento({ especialista }) {
   const { token, perfil } = useAuth()
-  const agenda = especialista.agenda || []
-  const usaAgendaFixa = agenda.length > 0
 
-  const [diaId, setDiaId] = useState('')
-  const [horario, setHorario] = useState('')
+  const [slotsDisponiveis, setSlotsDisponiveis] = useState([])
+  const [carregandoSlots, setCarregandoSlots] = useState(false)
+  const [slotSelecionado, setSlotSelecionado] = useState(null)
+
   const [dataHora, setDataHora] = useState('')
   const [assunto, setAssunto] = useState('')
   const [duvidas, setDuvidas] = useState('')
@@ -34,27 +34,62 @@ export default function CardAgendamento({ especialista }) {
   const [enviando, setEnviando] = useState(false)
   const [confirmado, setConfirmado] = useState(false)
 
-  const diaEscolhido = agenda.find((dia) => dia.id === diaId)
+  // Carrega slots reais da API para os próximos 30 dias
+  useEffect(() => {
+    let ativo = true
+    if (!especialista?.id) return undefined
 
-  function escolherDia(id) {
-    setDiaId(id)
-    setHorario('')
-    setErro('')
-    setConfirmado(false)
-  }
+    async function buscarSlots() {
+      try {
+        setCarregandoSlots(true)
+        const hoje = new Date()
+        const em30Dias = new Date()
+        em30Dias.setDate(hoje.getDate() + 30)
+
+        const fromStr = hoje.toISOString().split('T')[0]
+        const toStr = em30Dias.toISOString().split('T')[0]
+
+        const slots = await agendaService.getSlots(especialista.id, fromStr, toStr)
+        if (ativo && Array.isArray(slots)) {
+          setSlotsDisponiveis(slots)
+        }
+      } catch (err) {
+        // Ignora silenciosamente ou mantém fallback manual se a API não estiver respondendo
+      } finally {
+        if (ativo) setCarregandoSlots(false)
+      }
+    }
+
+    buscarSlots()
+    return () => {
+      ativo = false
+    }
+  }, [especialista?.id])
+
+  // Agrupa slots reais por data (YYYY-MM-DD)
+  const slotsPorDia = slotsDisponiveis.reduce((acc, slotIso) => {
+    const dataObj = new Date(slotIso)
+    const diaChave = dataObj.toLocaleDateString('pt-BR', {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+    })
+    if (!acc[diaChave]) acc[diaChave] = []
+    acc[diaChave].push({
+      iso: slotIso,
+      hora: dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    })
+    return acc
+  }, {})
+
+  const diasComSlots = Object.keys(slotsPorDia)
+  const temSlotsReais = diasComSlots.length > 0
 
   async function agendar(evento) {
     evento.preventDefault()
     setErro('')
     setErrosCampos({})
     setConfirmado(false)
-
-    if (usaAgendaFixa) {
-      if (!diaId) return setErro('Escolha um dia para a conversa.')
-      if (!horario) return setErro('Escolha um horário para a conversa.')
-      setConfirmado(true)
-      return
-    }
 
     if (!token) {
       setErro('Entre na sua conta de cliente para solicitar uma mentoria.')
@@ -64,8 +99,10 @@ export default function CardAgendamento({ especialista }) {
       setErro('Acesse com uma conta de cliente para agendar uma mentoria.')
       return
     }
-    if (!dataHora) {
-      setErrosCampos({ dataHora: 'Informe a data e o horário desejados.' })
+
+    const dataFinal = slotSelecionado || (dataHora ? new Date(dataHora).toISOString() : '')
+    if (!dataFinal) {
+      setErrosCampos({ dataHora: 'Escolha um horário para a conversa.' })
       return
     }
     if (!assunto.trim()) {
@@ -75,18 +112,18 @@ export default function CardAgendamento({ especialista }) {
 
     setEnviando(true)
     try {
-      const scheduledAt = new Date(dataHora).toISOString()
       await mentoringService.requestMentoring({
         specialistId: especialista.id,
         title: assunto.trim(),
         description: assunto.trim(),
         doubts: duvidas.trim(),
-        scheduledAt,
+        scheduledAt: dataFinal,
       })
       setConfirmado(true)
       setAssunto('')
       setDuvidas('')
       setDataHora('')
+      setSlotSelecionado(null)
     } catch (err) {
       const parsed = parseApiError(err, 'Não foi possível solicitar a mentoria.')
       const { errosCampos: campos, mensagemGeral } = extrairErrosDeCampo(
@@ -117,55 +154,105 @@ export default function CardAgendamento({ especialista }) {
         <span className="text-lg text-texto-secundario"> / sessão de {especialista.duracaoSessao}</span>
       </p>
 
-      {usaAgendaFixa ? (
-        <>
-          <fieldset className="mt-6">
-            <legend className="text-lg font-bold text-verde-titulo">1. Escolha o dia</legend>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {agenda.map((dia) => (
-                <label key={dia.id} className={`${estiloOpcao} ${diaId === dia.id ? opcaoAtiva : opcaoInativa}`}>
-                  <input
-                    type="radio"
-                    name="dia"
-                    value={dia.id}
-                    checked={diaId === dia.id}
-                    onChange={() => escolherDia(dia.id)}
-                    className="sr-only"
-                  />
-                  <span>{dia.diaSemana}</span>
-                  <span className="text-base font-normal">{dia.data}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <fieldset className="mt-6" disabled={!diaEscolhido}>
-            <legend className="text-lg font-bold text-verde-titulo">2. Escolha o horário</legend>
-            {diaEscolhido ? (
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {diaEscolhido.horarios.map((hora) => (
-                  <label key={hora} className={`${estiloOpcao} ${horario === hora ? opcaoAtiva : opcaoInativa}`}>
-                    <input
-                      type="radio"
-                      name="horario"
-                      value={hora}
-                      checked={horario === hora}
-                      onChange={() => {
-                        setHorario(hora)
-                        setErro('')
-                        setConfirmado(false)
-                      }}
-                      className="sr-only"
-                    />
-                    {hora}
-                  </label>
-                ))}
+      {carregandoSlots ? (
+        <div className="mt-8 flex items-center justify-center gap-2 py-6 text-verde-petroleo">
+          <Loader2 className="animate-spin" size={24} />
+          <span className="text-sm font-semibold">Consultando agenda do especialista...</span>
+        </div>
+      ) : temSlotsReais ? (
+        <div className="mt-6 space-y-4">
+          <label className="block text-base font-bold text-verde-titulo">
+            Horários disponíveis na agenda
+          </label>
+          <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
+            {diasComSlots.map((dia) => (
+              <div key={dia} className="rounded-xl border border-divisoria bg-campo/30 p-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-verde-titulo">
+                  {dia}
+                </span>
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  {slotsPorDia[dia].map((slot) => {
+                    const isSelected = slotSelecionado === slot.iso
+                    return (
+                      <button
+                        key={slot.iso}
+                        type="button"
+                        onClick={() => {
+                          setSlotSelecionado(slot.iso)
+                          setErro('')
+                          setErrosCampos({})
+                        }}
+                        className={`${estiloOpcao} ${isSelected ? opcaoAtiva : opcaoInativa}`}
+                      >
+                        <Clock size={14} className="mb-1" />
+                        {slot.hora}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            ) : (
-              <p className="mt-2 text-texto-secundario">Escolha um dia primeiro.</p>
+            ))}
+          </div>
+          {errosCampos.dataHora && (
+            <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+              {errosCampos.dataHora}
+            </p>
+          )}
+
+          <div className="mt-4">
+            <label htmlFor="assunto-mentoria" className="mb-1.5 block text-base font-bold text-verde-titulo">
+              Assunto da mentoria
+            </label>
+            <input
+              id="assunto-mentoria"
+              type="text"
+              value={assunto}
+              onChange={(e) => {
+                setAssunto(e.target.value)
+                setErrosCampos((atual) => ({ ...atual, assunto: '' }))
+              }}
+              placeholder="Ex.: Organização do fluxo de caixa"
+              aria-invalid={Boolean(errosCampos.assunto)}
+              className={`h-12 w-full rounded-xl border bg-white px-3 text-base text-verde-petroleo focus:outline-none! focus:ring-2 ${
+                errosCampos.assunto
+                  ? 'border-red-500 focus:ring-red-200'
+                  : 'border-divisoria focus:border-dourado-foco focus:ring-dourado-foco/15'
+              }`}
+            />
+            {errosCampos.assunto && (
+              <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+                {errosCampos.assunto}
+              </p>
             )}
-          </fieldset>
-        </>
+          </div>
+
+          <div>
+            <label htmlFor="duvidas-mentoria" className="mb-1.5 block text-base font-bold text-verde-titulo">
+              Principais dúvidas (opcional)
+            </label>
+            <textarea
+              id="duvidas-mentoria"
+              rows={2}
+              value={duvidas}
+              onChange={(e) => {
+                setDuvidas(e.target.value)
+                setErrosCampos((atual) => ({ ...atual, duvidas: '' }))
+              }}
+              placeholder="Conte brevemente o que gostaria de resolver..."
+              aria-invalid={Boolean(errosCampos.duvidas)}
+              className={`w-full rounded-xl border bg-white p-3 text-base text-verde-petroleo focus:outline-none! focus:ring-2 ${
+                errosCampos.duvidas
+                  ? 'border-red-500 focus:ring-red-200'
+                  : 'border-divisoria focus:border-dourado-foco focus:ring-dourado-foco/15'
+              }`}
+            />
+            {errosCampos.duvidas && (
+              <p role="alert" className="mt-1 text-sm font-semibold text-red-700">
+                {errosCampos.duvidas}
+              </p>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="mt-6 space-y-4">
           <div>
@@ -273,16 +360,7 @@ export default function CardAgendamento({ especialista }) {
         <div role="status" className="mt-4 flex gap-3 rounded-2xl bg-campo p-4 text-verde-titulo">
           <CalendarCheck aria-hidden="true" size={24} className="shrink-0" />
           <p className="text-base">
-            {usaAgendaFixa && diaEscolhido ? (
-              <>
-                Horário escolhido: <strong>{diaEscolhido.diaSemana}, {diaEscolhido.data} às {horario}</strong>. Na
-                próxima etapa você confirma e faz o pagamento.
-              </>
-            ) : (
-              <>
-                Solicitação enviada para <strong>{especialista.nome}</strong>! Acompanhe o status no seu painel.
-              </>
-            )}
+            Solicitação enviada para <strong>{especialista.nome}</strong>! Acompanhe o status no seu painel.
           </p>
         </div>
       )}
