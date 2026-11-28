@@ -12,6 +12,7 @@ import {
 import { formatarDataBR } from '../utils/formatadores'
 import AgendaCliente from './usuario/cliente/AgendaCliente'
 import AvaliacoesCliente from './usuario/cliente/AvaliacoesCliente'
+import EncontrarConselheiroCliente from './usuario/cliente/EncontrarConselheiroCliente' 
 import MensagensCliente from './usuario/cliente/MensagensCliente'
 import PlanoDeAcaoCliente from './usuario/cliente/PlanoDeAcaoCliente'
 import ConfiguracoesUsuario from './usuario/compartilhado/ConfiguracoesUsuario'
@@ -22,6 +23,7 @@ import SolicitacoesPendentesConselheiro from './usuario/conselheiro/Solicitacoes
 
 const titulos = {
   cliente: {
+    encontrar: 'Encontrar conselheiro',
     agenda: 'Minha agenda',
     plano: 'Meu plano de ação',
     avaliacoes: 'Minhas avaliações',
@@ -39,6 +41,7 @@ const titulos = {
 
 function ConteudoCliente({ secao, usuario, planoVersao }) {
   const secoes = {
+    encontrar: <EncontrarConselheiroCliente />, 
     agenda: <AgendaCliente usuario={usuario} />,
     plano: <PlanoDeAcaoCliente key={planoVersao} acoesIniciais={usuario.planoDeAcao} />,
     avaliacoes: <AvaliacoesCliente />,
